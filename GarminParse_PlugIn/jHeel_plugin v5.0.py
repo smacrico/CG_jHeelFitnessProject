@@ -33,7 +33,7 @@ print('Starting script...')
 # database_path = os.path.abspath('e:/jheel_dev/DataBasesDev/artemis.db')
  
 def create_table_if_not_exists():
-    conn = sqlite3.connect(r'g:/My Drive/Genesis_dev/DataBasesDev/artemis.db')
+    conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/artemis.db')
     cursor = conn.cursor()
 
     #drop table if exists
@@ -233,7 +233,7 @@ def parse_fit_file(file_path, activity_id):
 # Insert the session data into the database
 
 def insert_data_into_db(data):
-    conn = sqlite3.connect('g:/My Drive/Genesis_dev/DataBasesDev/artemis.db')
+    conn = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis.db')
     cursor = conn.cursor()
 
     # Specify the fields you care about
@@ -289,7 +289,7 @@ def insert_data_into_db(data):
 def create_view_if_not_exists():
     # conn = sqlite3.connect('c:/users/stma/healthdata/dbs/garmin_activities.db')
     # conn = sqlite3.connect('c:/users/stma/healthdata/dbs/garmin_activities.db')
-    conn = sqlite3.connect('g:/My Drive/Genesis_dev/DataBasesDev/artemis.db')
+    conn = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis.db')
     cursor = conn.cursor()
 
     cursor.execute('''
