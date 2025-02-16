@@ -9,14 +9,14 @@ from datetime import datetime
 
 class RunningAnalysis:
     def __init__(self, db_path):
-        self.db_path = r'g:/My Drive/Genesis_dev/DataBasesDev/Apex.db'  # Use consistent path
+        self.db_path = r'g:/My Drive/Phoenix/DataBasesDev/Apex.db'  # Use consistent path
         self.training_log = self.load_training_data()
     
     def load_training_data(self):
         """Load training data from SQLite database"""
         try:
             # conn = sqlite3.connect(self.db_path)
-            conn = sqlite3.connect(r'g:/My Drive/Genesis_dev/DataBasesDev/Apex.db')
+            conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/Apex.db')
             query = """
             SELECT date, running_economy, vo2max, distance, 
                    time, 
@@ -55,7 +55,7 @@ class RunningAnalysis:
     def save_training_log_to_db(self):
         """Save training log DataFrame to SQLite database"""
         try:
-            conn = sqlite3.connect(r'g:/My Drive/Genesis_dev/DataBasesDev/Apex.db')
+            conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/Apex.db')
             
             # Create a new table for training logs if it doesn't exist
             self.training_log.to_sql('training_logs', 
@@ -169,7 +169,7 @@ class RunningAnalysis:
         
     def load_training_data(self):
         try:
-            conn = sqlite3.connect(r'g:/My Drive/Genesis_dev/DataBasesDev/Apex.db')
+            conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/Apex.db')
             query = """
             SELECT 
                 date,
@@ -436,10 +436,10 @@ class RunningAnalysis:
 
 def main():
     # Database path
-    db_path = 'g:/My Drive/Genesis_dev/DataBasesDev/Apex.db'
+    db_path = 'g:/My Drive/Phoenix/DataBasesDev/Apex.db'
 
     # Create analysis object
-    analysis = RunningAnalysis('g:/My Drive/Genesis_dev/DataBasesDev/Apex.db')
+    analysis = RunningAnalysis('g:/My Drive/Phoenix/DataBasesDev/Apex.db')
     
     # Add sample session if database is empty
     if analysis.training_log.empty:
