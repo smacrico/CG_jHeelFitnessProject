@@ -8,7 +8,7 @@ import sys
 
 
 def create_table_if_not_exists():
-    conn = sqlite3.connect(r'g:/My Drive/Genesis_dev/DataBasesDev/Apex.db')
+    conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/Apex.db')
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -31,8 +31,8 @@ create_table_if_not_exists()
     
 try:
     # Establish connections to both databases
-    conn_artemis = sqlite3.connect('g:/My Drive/Genesis_dev/DataBasesDev/artemis.db')
-    conn_running_analysis = sqlite3.connect('g:/My Drive/Genesis_dev/DataBasesDev/Apex.db')
+    conn_artemis = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis.db')
+    conn_running_analysis = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/Apex.db')
 
     # Create cursors
     cursor_artemis = conn_artemis.cursor()
