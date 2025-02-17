@@ -16,7 +16,7 @@ now = datetime.datetime.now()
 timestamp = now.strftime('%Y%m%d_%H%M%S')
 
 # Include the timestamp in the log file name
-logging.basicConfig(filename=f'e:/jHeel_Dev/gProjects/Artemis/Logs_Dev/Prod_jheel_parse_fbbHRV{timestamp}.log', level=logging.INFO)
+logging.basicConfig(filename=f'c:/temp/Prod_jheel_parse_fbbHRV{timestamp}.log', level=logging.INFO)
 
 # Include the timestamp in the log file name
 logging.info('Starting script...')
@@ -27,7 +27,7 @@ def execute_fbb_hrv_plugin(fit_file_path, activity_id):
         fit_file = FitFile(fit_file_path)
         
         # Connect to database
-        conn = sqlite3.connect('e:/jheel_dev/DataBasesDev/artemis_hrv.db')
+        conn = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis_hrv.db')
         cursor = conn.cursor()
         
         # Process records
@@ -108,7 +108,7 @@ def execute_fbb_hrv_plugin(fit_file_path, activity_id):
         logging.error(f'Error executing fbb_hrv plugin: {e}')
 
 def create_table_if_not_exists():
-    conn = sqlite3.connect(r'e:/jheel_dev/DataBasesDev/artemis_hrv.db')
+    conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/artemis_hrv.db')
     cursor = conn.cursor()
 
     #drop table if exists
