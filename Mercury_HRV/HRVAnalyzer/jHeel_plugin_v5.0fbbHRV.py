@@ -328,7 +328,7 @@ if __name__ == "__main__":
     create_table_if_not_exists()
 try:
     # all_session_data = parse_all_fit_files_in_folder('c:/users/stma/healthdata/fitfiles/activities2025')
-    all_session_data = parse_all_fit_files_in_folder('c:/users/stma/healthdata/fitfiles/activities')
+    all_session_data = parse_all_fit_files_in_folder('c:/users/djsco/healthdata/fitfiles/activities')
     logging.info('All data inserted successfully.')
     print('All data inserted successfully (c)smacrico ')
 except Exception as e:
