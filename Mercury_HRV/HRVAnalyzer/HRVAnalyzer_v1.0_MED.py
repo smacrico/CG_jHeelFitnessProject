@@ -24,7 +24,7 @@ class HRVProcessor:
     
     _application_id = bytearray(b'\x0b\xdc\x0eu\x9b\xaaAz\x8c\x9f\xe9vf*].')
 
-    def __init__(self, db_path='e:/jheel_dev/DataBasesDev/artemis_hrv.db'):
+    def __init__(self, db_path='g:/My Drive/Phoenix/DataBasesDev/artemis_hrv.db'):
         self.db_path = db_path
         self._init_database()
 
@@ -96,7 +96,7 @@ class HRVProcessor:
         conn.close()
 
     def write_record_entry(self, conn, fit_file, activity_id, message_fields, record_num):
-        """Write a record message into the records DEV1 table"""
+        """Write a record message into the records MED table"""
         try:
             cursor = conn.cursor()
             
@@ -306,8 +306,8 @@ def process_activities_folder(folder_path):
 def main():
     # Process activities from the test folder
     # activities_folder = "activitiesTest"
-    processor = process_activities_folder('c:/users/stma/healthdata/fitfiles/activities')
-    # processor = process_activities_folder('c:/users/stma/healthdata/fitfiles/activities2025')
+    processor = process_activities_folder('c:/users/djsco/healthdata/fitfiles/activities')
+    # processor = process_activities_folder('c:/users/djsco/healthdata/fitfiles/activities2025')
     
     if processor:
         # Example analysis

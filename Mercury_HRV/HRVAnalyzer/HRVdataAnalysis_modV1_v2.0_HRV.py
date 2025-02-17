@@ -8,7 +8,7 @@ import sqlite3
 class EnhancedHRVAnalysis:
     def __init__(self):
         self.hrv_log = None
-        self.db_path = 'e:/jheel_dev/DataBasesDev/artemis_hrv.db'
+        self.db_path = 'g:/My Drive/Phoenix/DataBasesDev/artemis_hrv.db'
         self.load_data_from_db()
     
     def create_analysis_tables(self):
