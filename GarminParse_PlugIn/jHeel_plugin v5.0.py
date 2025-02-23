@@ -22,7 +22,7 @@ now = datetime.datetime.now()
 timestamp = now.strftime('%Y%m%d_%H%M%S')
 
 # Include the timestamp in the log file name
-logging.basicConfig(filename=f'c:/SteliosDev/logs/jheel_parse_Fields-v5{timestamp}.log', level=logging.INFO)
+logging.basicConfig(filename=f'c:/temp/logs/jheel_parse_Fields-v5{timestamp}.log', level=logging.INFO)
 
 # Include the timestamp in the log file name
 logging.info('Starting script...')
