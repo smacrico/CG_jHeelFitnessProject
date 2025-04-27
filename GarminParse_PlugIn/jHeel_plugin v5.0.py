@@ -314,7 +314,7 @@ if __name__ == "__main__":
     # all_session_data = parse_all_fit_files_in_folder('c:/steliosdev/jheel_dev/devinout/testfit')
     # all_session_data = parse_all_fit_files_in_folder('c:/users/stma/healthdata/fitfiles/activitiesTEST')
     # all_session_data = parse_all_fit_files_in_folder('c:/users/stma/healthdata/fitfiles/activities2025')
-    all_session_data = parse_all_fit_files_in_folder('c:/users/djsco/healthdata/fitfiles/activities')
+    all_session_data = parse_all_fit_files_in_folder('c:/users/jheel/jheelhealthdata/fitfiles/activities')
     insert_data_into_db(all_session_data)
     logging.info('All data inserted successfully.')
     print('All data inserted successfully.')
