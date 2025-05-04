@@ -21,9 +21,9 @@ cursor = conn.cursor()
 query_avg_pace = """
 SELECT
     CAST(strftime('%Y-%m-%d', a.start_time) AS TEXT) AS run_date,
-    AVG(1000.0 / r.speed) / 60.0 AS avg_pace_min_km
+    AVG(1000.0 / avg_speed) / 60.0 AS avg_pace_min_km
 FROM activities a
-JOIN activiti_records r ON a.activity_id = r.activity_id
+JOIN activity_records r ON a.activity_id = r.activity_id
 WHERE a.sport = 'running' AND r.speed > 0
 GROUP BY run_date
 ORDER BY run_date;
@@ -47,7 +47,7 @@ if not df_pace.empty:
 else:
     print('No running data found for pace analysis.')
 
-conn.close()
+# conn.close()
 
 
 
@@ -55,20 +55,22 @@ conn.close()
 
 # Example 2: Heart Rate Zones
 
+conn = sqlite3.connect(r'c:/users/jheel/jheelHealthData/DBs/garmin_activities.db')
+
 query_hr_records = """
 SELECT
     CAST(strftime('%Y-%m-%d', a.start_time) AS TEXT) AS run_date,
-    r.heart_rate,
+    r.hr,
     a.activity_id
-FROM activiiesy a
+FROM activities a
 JOIN activity_records r ON a.activity_id = r.activity_id
-WHERE a.sport = 'running' AND r.heart_rate > 0
+WHERE a.sport = 'running' AND r.hr > 0
 ORDER BY a.start_time;
 """
 
 cursor.execute(query_hr_records)
 results = cursor.fetchall()
-df_hr_records = pd.DataFrame(results, columns=['run_date', 'heart_rate', 'activity_id'])
+df_hr_records = pd.DataFrame(results, columns=['run_date', 'avg_hr', 'activity_id'])
 
 def calculate_hr_zones(heart_rates, max_hr):
     zones = {'Zone 1': 0, 'Zone 2': 0, 'Zone 3': 0, 'Zone 4': 0, 'Zone 5': 0}
@@ -92,7 +94,7 @@ def calculate_hr_zones(heart_rates, max_hr):
 MAX_HEART_RATE = 190  # Replace with your max heart rate
 
 if not df_hr_records.empty:
-    hr_zone_analysis = df_hr_records.groupby('run_date')['heart_rate'].apply(list).apply(lambda x: calculate_hr_zones(x, MAX_HEART_RATE)).apply(pd.Series)
+    hr_zone_analysis = df_hr_records.groupby('run_date')['avg_hr'].apply(list).apply(lambda x: calculate_hr_zones(x, MAX_HEART_RATE)).apply(pd.Series)
     hr_zone_analysis.index = hr_zone_analysis.index.map(pd.to_datetime)
     hr_zone_analysis = hr_zone_analysis.sort_index()
 
