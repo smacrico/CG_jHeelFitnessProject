@@ -95,7 +95,9 @@ plt.show()
 ### conn = sqlite3.connect(r'c:/users/jheel/jheelHealthData/DBs/garmin_summary.db')
 
 #connect from EY latpop
+# conn = sqlite3.connect(r'c:/smakryko/myHealthData/DBs/garmin_summary.db')
 conn = sqlite3.connect(r'c:/smakryko/myHealthData/DBs/garmin_summary.db')
+
 
 
 query_daily_steps_last_45 = f"""
@@ -104,7 +106,7 @@ FROM days_summary
 WHERE day >= DATE('{start_date.strftime('%Y-%m-%d')}')
 """
 df_daily_steps_last_45 = pd.read_sql_query(query_daily_steps_last_45, conn)
-df_daily_steps_last_45['day'] = pd.to_datetime(df_daily_steps_last_45['date'])
+df_daily_steps_last_45['date'] = pd.to_datetime(df_daily_steps_last_45['day'])
 print("\nΗμερήσια Βήματα (τελευταίες 45 ημέρες):")
 print(df_daily_steps_last_45.head())
 
