@@ -11,7 +11,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Συνδεθείτε στη βάση δεδομένων SQLite
-conn = sqlite3.connect(r'c:/users/jheel/jheelHealthData/DBs/garmin_activities.db')
+#conn = sqlite3.connect(r'c:/users/jheel/jheelHealthData/DBs/garmin_activities.db')
+#connect from EY latpop
+conn = sqlite3.connect(r'c:/smakryko/myHealthData/DBs/garmin_activities.db')
 
 # Δημιουργήστε ένα cursor
 cursor = conn.cursor()

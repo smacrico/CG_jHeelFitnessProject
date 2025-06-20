@@ -11,7 +11,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Συνδεθείτε στη βάση δεδομένων SQLite
-conn = sqlite3.connect(r'c:/users/jheel/jheelHealthData/DBs/garmin_activities.db')
+##### conn = sqlite3.connect(r'c:/users/jheel/jheelHealthData/DBs/garmin_activities.db')
+
+
+#connect from EY latpop
+conn = sqlite3.connect(r'c:/smakryko/myHealthData/DBs/garmin_activities.db')
+
+
+
+# db_path = 'path/to/your/garmin_data.db'  # Αντικαταστήστε με την πραγματική διαδρομή
 
 
 # db_path = 'path/to/your/garmin_data.db'  # Αντικαταστήστε με την πραγματική διαδρομή
@@ -43,7 +51,10 @@ plt.show()
 
 # --- Παράδειγμα 2: Μέση διάρκεια ύπνου ανά ημέρα ---
 
-conn = sqlite3.connect(r'c:/users/jheel/jheelHealthData/DBs/garmin.db')
+#### conn = sqlite3.connect(r'c:/users/jheel/jheelHealthData/DBs/garmin.db')
+#connect from EY latpop
+conn = sqlite3.connect(r'c:/smakryko/myHealthData/DBs/garmin.db')
+
 
 query_avg_sleep = """
 SELECT DATE(day) AS sleep_date, AVG(total_sleep / 3600.0) AS avg_sleep_hours
@@ -66,7 +77,10 @@ plt.tight_layout()
 plt.show()
 
 # --- Παράδειγμα 3: Ημερήσια βήματα ---
-conn = sqlite3.connect(r'c:/users/jheel/jheelHealthData/DBs/garmin_summary.db')
+### conn = sqlite3.connect(r'c:/users/jheel/jheelHealthData/DBs/garmin_summary.db')
+
+#connect from EY latpop
+conn = sqlite3.connect(r'c:/smakryko/myHealthData/DBs/garmin_summary.db')
 
 query_daily_steps = """
 SELECT day, steps
