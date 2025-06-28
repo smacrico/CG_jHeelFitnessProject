@@ -1,5 +1,5 @@
-############### create RunningAnalysis database
-# 
+############### create RunningAnalysis database in Production environment
+# dev 4.0 - fixed statments for training score and training log
 # 
 # 
 # 
@@ -8,11 +8,12 @@ import sys
 
 
 def create_table_if_not_exists():
-    conn = sqlite3.connect(r'e:/jheel_dev/DataBasesDev/RunningAnalysis.db')
+    # conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/Apex.db')
+    conn = sqlite3.connect('c:/smakryko/myHealthData/DataBasesDev/ApexDEV.db')
     cursor = conn.cursor()
 
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS running_sessions_DEV (
+        CREATE TABLE IF NOT EXISTS running_sessions (
             running_economy INT, 
             date TXT, 
             distance INT, 
@@ -31,9 +32,11 @@ create_table_if_not_exists()
     
 try:
     # Establish connections to both databases
-    conn_artemis = sqlite3.connect('e:/jheel_dev/DataBasesDev/artemis.db')
-    conn_running_analysis = sqlite3.connect('e:/jheel_dev/DataBasesDev/RunningAnalysis.db')
-
+    # conn_artemis = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemisDEV.db')
+    # conn_running_analysis = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/ApexDEV.db')
+    conn_artemis = sqlite3.connect('c:/smakryko/myHealthData/DataBasesDev/artemisDEV.db')
+    conn_running_analysis = sqlite3.connect('c:/smakryko/myHealthData/DataBasesDev/ApexDEV.db')
+    
     # Create cursors
     cursor_artemis = conn_artemis.cursor()
     cursor_running_analysis = conn_running_analysis.cursor()
@@ -42,10 +45,12 @@ try:
     
 
     # Select the specific columns from Artemis database
+    # FROM Artemistbl_Prod prod
+    # FROM Artemistbl_mariner
     cursor_artemis.execute('''
         SELECT running_economy, timestamp, distance, sport, vo2maxsession,  cardiacdrift, avg_heart_rate, total_elapsed_time
-        FROM Artemistbl_mariner
-        WHERE sport like '%run%'
+        FROM Artemistbl_fields_DEV 
+        WHERE sport like 'running'
     ''')
 
     # Fetch all the rows
@@ -53,7 +58,7 @@ try:
 
     # Insert the data into running_session table in RunningAnalysis database
     cursor_running_analysis.executemany('''
-        INSERT INTO running_sessions_DEV (running_economy, date, distance, sport, vo2max,  cardiacdrift, heart_rate, time)
+        INSERT INTO running_sessions (running_economy, date, distance, sport, vo2max,  cardiacdrift, heart_rate, time)
         VALUES (?, ?,?,?,?,?,?,?)
     ''', rows)
 
@@ -72,4 +77,4 @@ finally:
     if conn_running_analysis:
         conn_running_analysis.close()
 
-print("Data transfer completed successfully!")
+print("Data transfer completed successfully!") 
