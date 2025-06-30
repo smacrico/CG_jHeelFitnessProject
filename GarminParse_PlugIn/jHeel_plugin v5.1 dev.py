@@ -45,11 +45,11 @@ def create_table_if_not_exists():
     #drop table if exists
     # cursor.execute('DROP TABLE IF EXISTS Artemistbl_Fields')
     
-    cursor.execute('DROP TABLE IF EXISTS Artemistbl_Fields_DEV')
+    cursor.execute('DROP TABLE IF EXISTS Artemistbl_Fields')
     logging.info('Table dropped successfully.')
 
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Artemistbl_Fields_DEV (
+        CREATE TABLE IF NOT EXISTS Artemistbl_Fields (
             activity_id INT PRIMARY KEY,
             timestamp TEXT,
             sport TEXT,
@@ -92,7 +92,7 @@ def create_table_if_not_exists():
         )
     ''')
     
-    logging.info('Table Artemistbl_Fields_DEV created successfully.')
+    logging.info('Table Artemistbl_Fields created successfully.')
 
     conn.commit()
     conn.close()
@@ -289,7 +289,7 @@ def insert_data_into_db(data):
 
         # The activity_id does not exist in the table, so insert the new record
         cursor.execute('''
-            INSERT OR REPLACE INTO Artemistbl_Fields_DEV (activity_id, distance, hrv, fat, total_fat,carbs, total_carbs,  VO2maxSmooth, sport, avg_heart_rate, total_elapsed_time, steps, stress_hrpa, HR_RS_Deviation_Index ,hrv_sdrr_f, hrv_pnn50, hrv_pnn20, rmssd, lnrmssd, sdnn, sdsd, nn50, nn20, pnn20, Long, Short, Ectopic_S, hrv_rmssd, VO2maxSession, timestamp, CardiacDrift, CooperTest, SD2, SD1, HF, LF, VLF, pNN50, LFnu, HFnu, MeanHR, MeanRR, Running_Economy, aHRV, arMSSD, aSDNN)
+            INSERT OR REPLACE INTO Artemistbl_Fields (activity_id, distance, hrv, fat, total_fat,carbs, total_carbs,  VO2maxSmooth, sport, avg_heart_rate, total_elapsed_time, steps, stress_hrpa, HR_RS_Deviation_Index ,hrv_sdrr_f, hrv_pnn50, hrv_pnn20, rmssd, lnrmssd, sdnn, sdsd, nn50, nn20, pnn20, Long, Short, Ectopic_S, hrv_rmssd, VO2maxSession, timestamp, CardiacDrift, CooperTest, SD2, SD1, HF, LF, VLF, pNN50, LFnu, HFnu, MeanHR, MeanRR, Running_Economy, aHRV, arMSSD, aSDNN)
             VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?)
         ''', (session['activity_id'], session['distance'], session['hrv'], session['fat'], session['Total Fat'],session['Carbs'], session['Total Carbs'],session['VO2maxSmooth'], session['sport'], 
               session['avg_heart_rate'], session['total_elapsed_time'],
@@ -309,7 +309,7 @@ def create_view_if_not_exists():
     cursor = conn.cursor()
 
     cursor.execute('''
-        CREATE VIEW IF NOT EXISTS RunFields_DEV_view AS
+        CREATE VIEW IF NOT EXISTS RunFields_view AS
         SELECT activities.*
         FROM activities
         INNER JOIN Artemistbl_Fields_DEV ON activities.activity_id = Artemistbl_Fieldsr.activity_id
