@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import scipy.integrate
 from scipy.signal import welch
 from scipy.interpolate import interp1d
 
@@ -95,8 +96,10 @@ def calculate_frequency_domain_hrv(ibi, target_fs=4.0):
     
     # Calculate PSD using Welch's method
     nperseg = min(256, len(interpolated_ibi) // 4)  # Adaptive window size
-    frequencies, psd = welch(interpolated_ibi, fs=target_fs, nperseg=nperseg, 
-                           overlap=nperseg//2, window='hann')
+    # frequencies, psd = welch(interpolated_ibi, fs=target_fs, nperseg=nperseg, 
+    #                       overlap=nperseg//2, window='hann')
+    frequencies, psd = welch(interpolated_ibi, fs=target_fs, nperseg=nperseg, noverlap=nperseg//2, window='hann')
+    # Normalize PSD to total power
     
     # Define frequency bands (standard HRV bands)
     vlf_band = (frequencies >= 0.0033) & (frequencies < 0.04)
@@ -104,9 +107,9 @@ def calculate_frequency_domain_hrv(ibi, target_fs=4.0):
     hf_band = (frequencies >= 0.15) & (frequencies <= 0.4)
     
     # Calculate power in each band using trapezoidal integration
-    vlf_power = np.trapz(psd[vlf_band], frequencies[vlf_band]) if np.any(vlf_band) else 0
-    lf_power = np.trapz(psd[lf_band], frequencies[lf_band]) if np.any(lf_band) else 0
-    hf_power = np.trapz(psd[hf_band], frequencies[hf_band]) if np.any(hf_band) else 0
+    vlf_power = scipy.integrate.trapezoid(psd[vlf_band], frequencies[vlf_band]) if np.any(vlf_band) else 0
+    lf_power = scipy.integrate.trapezoid(psd[lf_band], frequencies[lf_band]) if np.any(lf_band) else 0
+    hf_power = scipy.integrate.trapezoid(psd[hf_band], frequencies[hf_band]) if np.any(hf_band) else 0
     
     total_power = vlf_power + lf_power + hf_power
     

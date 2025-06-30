@@ -49,7 +49,7 @@ try:
     # FROM Artemistbl_mariner
     cursor_artemis.execute('''
         SELECT running_economy, timestamp, distance, sport, vo2maxsession,  cardiacdrift, avg_heart_rate, total_elapsed_time
-        FROM Artemistbl_fields_DEV 
+        FROM Artemistbl_fields 
         WHERE sport like 'running'
     ''')
 

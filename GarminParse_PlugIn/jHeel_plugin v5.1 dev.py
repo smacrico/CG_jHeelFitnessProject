@@ -312,7 +312,7 @@ def create_view_if_not_exists():
         CREATE VIEW IF NOT EXISTS RunFields_view AS
         SELECT activities.*
         FROM activities
-        INNER JOIN Artemistbl_Fields_DEV ON activities.activity_id = Artemistbl_Fieldsr.activity_id
+        INNER JOIN Artemistbl_Fields ON activities.activity_id = Artemistbl_Fields.activity_id
         where Artemistbl_Fields.sport == "running" ORDER BY Artemistbl_Fields.timestamp DESC
     ''')
     
