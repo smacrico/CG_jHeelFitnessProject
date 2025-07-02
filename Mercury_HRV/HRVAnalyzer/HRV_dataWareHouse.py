@@ -30,6 +30,7 @@ def create_unified_tables():
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS hrv_sessions (
         activity_id TEXT PRIMARY KEY,
+        name TEXT,
         source TEXT,
         timestamp TEXT,
         sport TEXT,
@@ -72,6 +73,7 @@ def create_unified_tables():
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS hrv_records (
         activity_id TEXT,
+        name TEXT,
         record INTEGER,
         source TEXT,
         timestamp TEXT,
@@ -106,15 +108,25 @@ def ingest_fit_file(file_path, source_hint=None):
     record_num = 0
 
     for msg in fit_file.messages:
+        
+        
+        if msg.name == 'sport':
+                fields = msg.fields
+                field_dict = {field.name: field.value for field in fields}
+                
+                name = field_dict.get('name')
+                
+                
         if msg.name == 'record':
             fields = {field.name: field.value for field in msg.fields}
             cursor.execute('''
                 INSERT OR IGNORE INTO hrv_records (
-                    activity_id, record, source, timestamp, hrv_s, hrv_btb, hrv_hr, rrhr,
+                    activity_id, name, record, source, timestamp, hrv_s, hrv_btb, hrv_hr, rrhr,
                     rawHR, RRint, hrv, rmssd, sdnn, SaO2_C, stress_hrp
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 activity_id,
+                name,
                 record_num,
                 source,
                 fields.get('timestamp'),
@@ -136,13 +148,14 @@ def ingest_fit_file(file_path, source_hint=None):
             fields = {field.name: field.value for field in msg.fields}
             cursor.execute('''
                 INSERT OR IGNORE INTO hrv_sessions (
-                    activity_id, source, timestamp, sport, min_hr, hrv_rmssd, hrv_sdrr_f,
+                    activity_id, name, source, timestamp, sport, min_hr, hrv_rmssd, hrv_sdrr_f,
                     hrv_sdrr_l, hrv_pnn50, hrv_pnn20, armssd, asdnn, SaO2, trnd_hrv, recovery,
                     sdnn, sdsd, dBeats, sBeats, session_hrv, NN50, NN20, sd1, sd2, lf, hf, vlf,
                     pNN50, lf_nu, hf_nu, mean_hr, mean_rr, stress_hrpa, steps, distance, vo2max
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 activity_id,
+                name,
                 source,
                 fields.get('timestamp'),
                 fields.get('sport'),

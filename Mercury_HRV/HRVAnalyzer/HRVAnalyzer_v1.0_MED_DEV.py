@@ -44,6 +44,7 @@ class HRVProcessor:
                 hrv_btb INTEGER,
                 hrv_hr INTEGER,
                 stress_hrp INTEGER,
+                avg_stress INTEGER,
                 PRIMARY KEY (activity_id, record)
             )
         """)
@@ -59,7 +60,8 @@ class HRVProcessor:
                 hrv_sdrr_l INTEGER,
                 hrv_pnn50 INTEGER,
                 hrv_pnn20 INTEGER,
-                stress_hrpa INTEGER
+                stress_hrpa INTEGER,
+                avg_stress INTEGER
             )
         """)
 
@@ -74,7 +76,8 @@ class HRVProcessor:
                 AVG(hrv_pnn50) as avg_pnn50,
                 AVG(hrv_pnn20) as avg_pnn20,
                 AVG(stress_hrpa) as avg_stress_hrpa,
-                MIN(min_hr) as lowest_hr
+                MIN(min_hr) as lowest_hr,
+                AVG(avg_stress) as avg_stress
             FROM hrv_sessionsMED
             GROUP BY DATE(timestamp)
         """)
@@ -88,8 +91,9 @@ class HRVProcessor:
                 r.hrv_hr,
                 s.hrv_rmssd,
                 s.hrv_sdrr_f,
-                s.hrv_sdrr_l
-            FROM hrv_recordsMED r
+                s.hrv_sdrr_l,
+                s.avg_stress
+                FROM hrv_recordsMED r
             JOIN hrv_sessionsMED s ON r.activity_id = s.activity_id
         """)
 
@@ -116,13 +120,14 @@ class HRVProcessor:
                     message_fields.get('hrv_s'),
                     message_fields.get('hrv_btb'),
                     message_fields.get('hrv_hr'),
-                    message_fields.get('stress_hrp')
+                    message_fields.get('stress_hrp'),
+                    message_fields.get('avg_stress')  # Default to 0 if not present
                 )
                 
                 cursor.execute("""
                     INSERT INTO hrv_recordsMED 
-                    (activity_id, record, timestamp, hrv_s, hrv_btb, hrv_hr, stress_hrp)
-                    VALUES (?, ?, ?, ?, ?, ?,?)
+                    (activity_id, record, timestamp, hrv_s, hrv_btb, hrv_hr, stress_hrp, avg_stress)
+                    VALUES (?, ?, ?, ?, ?, ?,?, ?)
                 """, record)
                 
                 logger.debug(f"Writing HRV record for {activity_id}, record {record_num}")
@@ -155,14 +160,15 @@ class HRVProcessor:
                     message_fields.get('hrv_sdrr_l'),
                     message_fields.get('hrv_pnn50'),
                     message_fields.get('hrv_pnn20'),
-                    message_fields.get('stress_hrpa')   
+                    message_fields.get('stress_hrpa'),
+                    message_fields.get('avg_stress')  # Default to 0 if not present  
                 )
                 
                 cursor.execute("""
                     INSERT INTO hrv_sessionsMED 
                     (activity_id, timestamp, min_hr, hrv_rmssd, hrv_sdrr_f, 
-                     hrv_sdrr_l, hrv_pnn50, hrv_pnn20, stress_hrpa)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     hrv_sdrr_l, hrv_pnn50, hrv_pnn20, stress_hrpa, avg_stress)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)
                 """, session)
                 
                 logger.debug(f"Writing HRV session for {activity_id}")
@@ -233,7 +239,8 @@ class HRVProcessor:
                 avg_sdrr_l,
                 avg_pnn50,
                 avg_pnn20,
-                avg_stress_hrpa
+                avg_stress_hrpa,
+                avg_stress
             FROM daily_hrv_summaryMED
             ORDER BY date DESC
             LIMIT ?
@@ -252,7 +259,8 @@ class HRVProcessor:
             'sdrr_l_mean': df['avg_sdrr_l'].mean(),
             'pnn50_mean': df['avg_pnn50'].mean(),
             'pnn20_mean': df['avg_pnn20'].mean(),
-            'stress_hrpa_mean': df['avg_stress_hrpa'].mean()
+            'stress_hrpa_mean': df['avg_stress_hrpa'].mean(),
+            'avg_stress_mean': df['avg_stress'].mean(),
         }
         
         # Calculate trends
@@ -271,7 +279,8 @@ class HRVProcessor:
                 hrv_sdrr_l,
                 hrv_pnn50,
                 stress_hrpa,
-                min_hr
+                min_hr,
+                avg_stress
             FROM hrv_sessionsMED
             WHERE activity_id = ?
         """, (activity_id,))

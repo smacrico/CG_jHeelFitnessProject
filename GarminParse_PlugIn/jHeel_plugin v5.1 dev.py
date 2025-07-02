@@ -51,6 +51,7 @@ def create_table_if_not_exists():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Artemistbl_Fields (
             activity_id INT PRIMARY KEY,
+            name TEXT,
             timestamp TEXT,
             sport TEXT,
             avg_heart_rate INT,
@@ -131,7 +132,14 @@ def parse_fit_file(file_path, activity_id):
     session_data = []
 
     for msg in messages:
+        
+            if msg.name == 'sport':
+                fields = msg.fields
+                field_dict = {field.name: field.value for field in fields}
+                
+                name = field_dict.get('name')
 
+                    
             if msg.name == 'session':
                 fields = msg.fields
                 field_dict = {field.name: field.value for field in fields}
@@ -191,6 +199,7 @@ def parse_fit_file(file_path, activity_id):
                 
                 session_data.append({
                     'activity_id': activity_id,
+                    'name': name,  # 'name' field from the sport message
                     'timestamp': timestamp, # '2021-09-01 12:00:00
                     'sport': sport,
                     'avg_heart_rate': avg_heart_rate,
@@ -289,9 +298,9 @@ def insert_data_into_db(data):
 
         # The activity_id does not exist in the table, so insert the new record
         cursor.execute('''
-            INSERT OR REPLACE INTO Artemistbl_Fields (activity_id, distance, hrv, fat, total_fat,carbs, total_carbs,  VO2maxSmooth, sport, avg_heart_rate, total_elapsed_time, steps, stress_hrpa, HR_RS_Deviation_Index ,hrv_sdrr_f, hrv_pnn50, hrv_pnn20, rmssd, lnrmssd, sdnn, sdsd, nn50, nn20, pnn20, Long, Short, Ectopic_S, hrv_rmssd, VO2maxSession, timestamp, CardiacDrift, CooperTest, SD2, SD1, HF, LF, VLF, pNN50, LFnu, HFnu, MeanHR, MeanRR, Running_Economy, aHRV, arMSSD, aSDNN)
-            VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?)
-        ''', (session['activity_id'], session['distance'], session['hrv'], session['fat'], session['Total Fat'],session['Carbs'], session['Total Carbs'],session['VO2maxSmooth'], session['sport'], 
+            INSERT OR REPLACE INTO Artemistbl_Fields (activity_id, name, distance, hrv, fat, total_fat,carbs, total_carbs,  VO2maxSmooth, sport, avg_heart_rate, total_elapsed_time, steps, stress_hrpa, HR_RS_Deviation_Index ,hrv_sdrr_f, hrv_pnn50, hrv_pnn20, rmssd, lnrmssd, sdnn, sdsd, nn50, nn20, pnn20, Long, Short, Ectopic_S, hrv_rmssd, VO2maxSession, timestamp, CardiacDrift, CooperTest, SD2, SD1, HF, LF, VLF, pNN50, LFnu, HFnu, MeanHR, MeanRR, Running_Economy, aHRV, arMSSD, aSDNN)
+            VALUES (?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?)
+        ''', (session['activity_id'],session['name'], session['distance'], session['hrv'], session['fat'], session['Total Fat'],session['Carbs'], session['Total Carbs'],session['VO2maxSmooth'], session['sport'], 
               session['avg_heart_rate'], session['total_elapsed_time'],
               session['Steps'], session['stress_hrpa'], session['HR-RS_Deviation Index'],session['hrv_sdrr_f'], session['hrv_pnn50'], session['hrv_pnn20'], session['RMSSD'], session['lnRMSSD'], session['SDNN'], session['SDSD'], session['NN50'], session['NN20'], session['pnn20'], session['Long'], session['Short'], session['Ectopic_S'], session['hrv_rmssd'], session['VO2maxSession'], 
               session ['timestamp'],session['CardiacDrift'], session['CooperTest'], session['SD2'], session['SD1'], session['HF'] , session['LF'], session['LF'], session['pNN50'], session['LFnu'], session['HFnu'],
