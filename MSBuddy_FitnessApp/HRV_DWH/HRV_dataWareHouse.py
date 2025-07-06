@@ -215,9 +215,9 @@ def ingest_folder(folder_path, source_hint=None):
 def analyze_hrv_trends(days=30):
     conn = sqlite3.connect(DB_PATH)
     query = """
-    SELECT date(timestamp) as date, AVG(hrv_rmssd) as avg_rmssd, AVG(sdnn) as avg_sdnn
+    SELECT date(timestamp) as date, AVG(armssd) as avg_rmssd, AVG(asdnn) as avg_sdnn
     FROM hrv_sessions
-    WHERE timestamp >= date('now', ?)
+    WHERE timestamp >= date('now', ?) and name is 'F3b Monitor+HRV'
     GROUP BY date(timestamp)
     ORDER BY date(timestamp) DESC
     """
@@ -238,24 +238,33 @@ def analyze_hrv_trends(days=30):
 
 # --- Recovery Score Calculation ---
 
-def calculate_recovery_score(activity_id):
-    conn = sqlite3.connect(DB_PATH)
+def calculate_recovery_score(activity_id, conn):
     cursor = conn.cursor()
     cursor.execute("""
         SELECT hrv_rmssd, sdnn, hrv_pnn50 FROM hrv_sessions WHERE activity_id = ?
     """, (activity_id,))
     result = cursor.fetchone()
-    conn.close()
     if result and all(result):
         rmssd_score = min(100, result[0] / 2)
         sdnn_score = min(100, result[1] / 2)
         pnn50_score = result[2] or 0
         recovery_score = (rmssd_score + sdnn_score + pnn50_score) / 3
-        print(f"Recovery score for {activity_id}: {recovery_score:.2f}")
         return recovery_score
     else:
-        print(f"No session data found for {activity_id}")
         return None
+
+def calculate_all_recovery_scores():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT activity_id FROM hrv_sessions")
+    activity_ids = [row[0] for row in cursor.fetchall()]
+    results = []
+    for activity_id in activity_ids:
+        score = calculate_recovery_score(activity_id, conn)
+        results.append((activity_id, score))
+        print(f"Recovery score for {activity_id}: {score if score is not None else 'No data'}")
+    conn.close()
+    return results
 
 # --- Main Execution ---
 if __name__ == "__main__":
@@ -264,5 +273,6 @@ if __name__ == "__main__":
     ingest_folder("C:/smakryko/myHealthData/HealtDataSystemAnalysis/TestFitFiles/Garmin", source_hint="GARMIN")
     # Run analytics
     analyze_hrv_trends(days=30)
+    calculate_all_recovery_scores()
     # Example recovery score
     # calculate_recovery_score("your_activity_id_here")
