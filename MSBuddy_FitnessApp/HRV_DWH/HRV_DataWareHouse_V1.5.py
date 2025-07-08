@@ -52,27 +52,27 @@ class HRVAnalytics:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 query = """
-                SELECT 
-                    date(timestamp) as date, 
-                    AVG(hrv_rmssd) as avg_rmssd, 
-                    AVG(sdnn) as avg_sdnn,
-                    AVG(hrv_pnn50) as avg_pnn50,
-                    AVG(mean_hr) as avg_hr,
-                    AVG(recovery) as avg_recovery,
-                    COUNT(*) as session_count,
-                    MIN(hrv_rmssd) as min_rmssd,
-                    MAX(hrv_rmssd) as max_rmssd,
-                    STDEV(hrv_rmssd) as std_rmssd
-                FROM hrv_sessions
-                WHERE timestamp >= date('now', ?)
-                    AND hrv_rmssd IS NOT NULL
-                    AND sdnn IS NOT NULL
-                GROUP BY date(timestamp)
-                ORDER BY date(timestamp) ASC
+              SELECT 
+                date(timestamp) as date, 
+                AVG(armssd) as avg_rmssd, 
+                AVG(asdnn) as avg_sdnn,
+                AVG(nn50) as avg_pnn50,
+                AVG(mean_hr) as avg_hr,
+                AVG(recovery) as avg_recovery,
+                COUNT(*) as session_count,
+                MIN(armssd) as min_rmssd,
+                MAX(armssd) as max_rmssd
+            FROM hrv_sessions
+            WHERE timestamp >= date('now', ?) and name is 'F3b Monitor+HRV'              
+            GROUP BY date(timestamp)
+            ORDER BY date(timestamp) ASC
+
                 """
                 
                 df = pd.read_sql_query(query, conn, params=(f'-{days} days',))
-                
+                df['std_rmssd'] = df['avg_rmssd'].rolling(window=7).std()  # 7-day rolling std, or
+                # df['std_rmssd'] = df['avg_rmssd'].std()  # overall std
+ 
         except sqlite3.Error as e:
             logger.error(f"Database error in analyze_hrv_trends: {e}")
             return self._generate_sample_trend_data(days)
@@ -181,7 +181,9 @@ class HRVAnalytics:
         print(f"Data Points: {results['data_points']} days")
         
         if "trends" in results:
-            print("\n📈 TREND SUMMARY:")
+            # print("\n📈 TREND SUMMARY:")
+            print("\n[Trend] TREND SUMMARY:")
+
             print("-" * 30)
             
             rmssd_trend = results["trends"]["rmssd"]
@@ -196,7 +198,9 @@ class HRVAnalytics:
             
         if "statistics" in results:
             stats = results["statistics"]
-            print(f"\n📊 RECENT vs OVERALL:")
+            # print(f"\n📊 RECENT vs OVERALL:")
+            print("\n[Trend] TREND OVERALL:")
+
             print("-" * 30)
             print(f"RMSSD: {stats['rmssd']['recent_vs_overall']:+.1f}% change")
             print(f"SDNN: {stats['sdnn']['recent_vs_overall']:+.1f}% change")

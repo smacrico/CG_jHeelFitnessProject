@@ -125,6 +125,8 @@ def export_hrv_data_for_powerbi():
         'Critical_Threshold': [20, 25, 50, 85, 200]
     })
     
+
+
     targets.to_csv("hrv_targets.csv", index=False)
     
     conn.close()
