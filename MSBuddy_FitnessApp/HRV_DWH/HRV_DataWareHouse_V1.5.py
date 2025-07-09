@@ -101,11 +101,15 @@ class HRVAnalytics:
             
             # RMSSD trend
             rmssd_trend = np.polyfit(x, df['avg_rmssd'].fillna(0), 1)
+            print(f"RMSSD Trend: {rmssd_trend}")
             rmssd_r_value = np.corrcoef(x, df['avg_rmssd'].fillna(0))[0, 1]
+            print(f"RMSSD Correlation: {rmssd_r_value:.3f}")
             
             # SDNN trend
             sdnn_trend = np.polyfit(x, df['avg_sdnn'].fillna(0), 1)
+            print(f"SDNN Trend: {sdnn_trend}")
             sdnn_r_value = np.corrcoef(x, df['avg_sdnn'].fillna(0))[0, 1]
+            print(f"SDNN Correlation: {sdnn_r_value:.3f}")
             
             results.update({
                 "trends": {
@@ -222,7 +226,7 @@ class HRVAnalytics:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT hrv_rmssd, sdnn, hrv_pnn50, mean_hr, recovery, 
+                    SELECT armssd, asdnn, nn50, mean_hr, recovery, 
                            lf, hf, vlf, stress_hrpa, name, source
                     FROM hrv_sessions 
                     WHERE activity_id = ?
@@ -238,29 +242,29 @@ class HRVAnalytics:
             return None
         
         # Unpack results
-        rmssd, sdnn, pnn50, mean_hr, existing_recovery, lf, hf, vlf, stress, name, source = result
+        armssd, asdnn, nn50, mean_hr, existing_recovery, lf, hf, vlf, stress, name, source = result
         
         # Calculate based on method
         if method == "simple":
-            return self._calculate_simple_recovery_score(rmssd, sdnn, pnn50, activity_id, name)
+            return self._calculate_simple_recovery_score(armssd, asdnn, nn50, activity_id, name)
         elif method == "comprehensive":
             return self._calculate_comprehensive_recovery_score(
-                rmssd, sdnn, pnn50, mean_hr, lf, hf, stress, activity_id, name
+                armssd, asdnn, nn50, mean_hr, lf, hf, stress, activity_id, name
             )
         elif method == "personalized":
             return self._calculate_personalized_recovery_score(
-                rmssd, sdnn, pnn50, mean_hr, lf, hf, stress, activity_id, name, source
+                armssd, asdnn, nn50, mean_hr, lf, hf, stress, activity_id, name, source
             )
         else:
             raise ValueError(f"Unknown method: {method}")
     
-    def _calculate_simple_recovery_score(self, rmssd: float, sdnn: float, pnn50: float, 
+    def _calculate_simple_recovery_score(self, armssd: float, asdnn: float, nn50: float, 
                                        activity_id: str, name: str) -> Dict:
         """Simple recovery score calculation (fixed version of original)"""
         # Handle None values
-        rmssd = rmssd or 0
-        sdnn = sdnn or 0
-        pnn50 = pnn50 or 0
+        rmssd = armssd or 0
+        sdnn = asdnn or 0
+        pnn50 = nn50 or 0
         
         # Fixed calculation (was dividing tuple by number)
         rmssd_score = min(100, max(0, rmssd / 0.8))  # Scale: good RMSSD ~80ms = 100 points
@@ -289,7 +293,7 @@ class HRVAnalytics:
         print(f"Simple Recovery Score for {activity_id} ({name}): {recovery_score:.1f}/100")
         return result
     
-    def _calculate_comprehensive_recovery_score(self, rmssd: float, sdnn: float, pnn50: float,
+    def _calculate_comprehensive_recovery_score(self, armssd: float, asdnn: float, nn50: float,
                                               mean_hr: float, lf: float, hf: float, stress: float,
                                               activity_id: str, name: str) -> Dict:
         """Comprehensive recovery score using multiple HRV domains"""
@@ -357,7 +361,7 @@ class HRVAnalytics:
         print(f"Comprehensive Recovery Score for {activity_id} ({name}): {recovery_score:.1f}/100")
         return result
     
-    def _calculate_personalized_recovery_score(self, rmssd: float, sdnn: float, pnn50: float,
+    def _calculate_personalized_recovery_score(self, armssd: float, asdnn: float, pnn50: float,
                                              mean_hr: float, lf: float, hf: float, stress: float,
                                              activity_id: str, name: str, source: str) -> Dict:
         """Personalized recovery score using individual baselines"""
@@ -365,8 +369,8 @@ class HRVAnalytics:
         baselines = self._get_personal_baselines(source)
         
         # Calculate relative scores against personal baselines
-        rmssd_relative = (rmssd / baselines['rmssd']) * 100 if baselines['rmssd'] > 0 else 50
-        sdnn_relative = (sdnn / baselines['sdnn']) * 100 if baselines['sdnn'] > 0 else 50
+        rmssd_relative = (armssd / baselines['rmssd']) * 100 if baselines['rmssd'] > 0 else 50
+        sdnn_relative = (asdnn / baselines['sdnn']) * 100 if baselines['sdnn'] > 0 else 50
         
         # Apply personalized weights (could be learned from user data)
         recovery_score = min(100, max(0, (rmssd_relative + sdnn_relative) / 2))
@@ -448,7 +452,7 @@ def main():
     print("\n=== RECOVERY SCORE CALCULATIONS ===")
     
     # Simple method
-    simple_score = hrv_analytics.calculate_recovery_score("example_session_001", method="simple")
+    simple_score = hrv_analytics.calculate_recovery_score("17080654324", method="simple")
     
     # Comprehensive method
     comprehensive_score = hrv_analytics.calculate_recovery_score("example_session_001", method="comprehensive")

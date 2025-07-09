@@ -488,7 +488,7 @@ def calculate_recovery_score(activity_id, conn):
         sdnn_score = min(100, result[1] / 2)
         pnn50_score = result[2] or 0
         recovery_score = (rmssd_score + sdnn_score + pnn50_score) / 3
-        return recovery_score
+        return recovery_score    
     else:
         return None
 
@@ -523,7 +523,7 @@ def comprehensive_hrv_health_check():
     drops = detect_hrv_drops(baseline, days=14)
     if drops:
         for drop in drops:
-            print(f"⚠️  {drop['date']}: RMSSD {drop['rmssd']:.1f} ({drop['severity']} - {drop['drop_percent']:.1f}% below baseline)")
+            print(f"⚠️  {drop['date']}: RMSSD {drop['armssd']:.1f} ({drop['severity']} - {drop['drop_percent']:.1f}% below baseline)")
     else:
         print("✅ No significant HRV drops detected in the last 14 days.")
     print()

@@ -241,7 +241,7 @@ def analyze_hrv_trends(days=30):
 def calculate_recovery_score(activity_id, conn):
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT hrv_rmssd, sdnn, hrv_pnn50 FROM hrv_sessions WHERE activity_id = ?
+        SELECT armssd, asdnn, nn50 FROM hrv_sessions WHERE name is 'F3b Monitor+HRV' AND activity_id = ?
     """, (activity_id,))
     result = cursor.fetchone()
     if result and all(result):
@@ -516,7 +516,8 @@ def comprehensive_hrv_health_check():
 if __name__ == "__main__":
     create_unified_tables()
     # Example: ingest all .fit files from a folder
-    ingest_folder("C:/smakryko/myHealthData/HealtDataSystemAnalysis/TestFitFiles/Garmin", source_hint="GARMIN")
+    # ingest_folder("C:/smakryko/myHealthData/HealtDataSystemAnalysis/TestFitFiles/Garmin", source_hint="GARMIN")
+    # ingest_folder("C:/smakryko/myHealthData/FitFiles/Activities", source_hint="GARMIN")
     # Run analytics
     analyze_hrv_trends(days=30)
     calculate_all_recovery_scores()
