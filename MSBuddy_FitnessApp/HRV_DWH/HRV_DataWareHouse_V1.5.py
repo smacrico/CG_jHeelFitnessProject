@@ -434,7 +434,38 @@ class HRVAnalytics:
             "message": "Using sample data (database not accessible)",
             "dataframe": df,
             "data_points": len(df)
+            
+            
+ 
+    
+    
         }
+
+def plot_hrv_trend(df):
+    plt.figure()
+    plt.plot(df['date'], df['daily_rmssd'])
+    plt.title('HRV Trend')
+
+def plot_hrv_histogram(df, column='daily_rmssd'):
+    plt.figure()
+    plt.hist(df[column])
+    plt.title('HRV Histogram')
+# --- Data Preparation for Visualization ---
+def get_daily_hrv_dataframe(days=30):
+    conn = sqlite3.connect(DB_PATH)
+    print(f"Fetching daily HRV data for the last {days} days...")
+    query = """
+    SELECT date(timestamp) as date, AVG(armssd) as daily_rmssd
+    FROM hrv_sessions
+    WHERE timestamp >= date('now', ?) and name is 'F3b Monitor+HRV'
+    GROUP BY date(timestamp)
+    ORDER BY date(timestamp) ASC
+    """
+    print
+    df = pd.read_sql_query(query, conn, params=(f'-{days} days',))
+    conn.close()
+    return df
+
 
 # === USAGE EXAMPLES ===
 
@@ -443,6 +474,13 @@ def main():
     
     # Initialize analytics system
     hrv_analytics = HRVAnalytics()
+    
+    # Plot HRV trend and histogram
+    print('Plotting HRV trend and histogram...')
+    df_plot = get_daily_hrv_dataframe(days=30)
+    plot_hrv_trend(df_plot)
+    plot_hrv_histogram(df_plot, column='daily_rmssd')
+    
     
     # Example 1: Analyze trends
     print("=== HRV TREND ANALYSIS ===")
