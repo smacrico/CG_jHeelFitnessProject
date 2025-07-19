@@ -52,12 +52,9 @@ else:
 # conn.close()
 
 
-
-
-
 # Example 2: Heart Rate Zones
 
-conn = sqlite3.connect(r'c:/users/jheel/jheelHealthData/DBs/garmin_activities.db')
+conn = sqlite3.connect(r'c:/smakryko/myHealthData/DBs/garmin_activities.db')
 
 query_hr_records = """
 SELECT

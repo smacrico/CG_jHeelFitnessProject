@@ -1,4 +1,4 @@
-# this file is used to analyze basic data from Garmin Forunner 245
+ # this file is used to analyze basic data from Garmin Forunner 245
 """ stelios (c) steliosmacrico "jHeel 2025 creating plugin"""
 
 ######################################
