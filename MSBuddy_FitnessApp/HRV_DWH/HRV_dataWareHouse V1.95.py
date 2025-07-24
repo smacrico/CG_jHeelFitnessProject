@@ -27,7 +27,7 @@ def create_unified_tables():
 
     # Unified sessions table
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS hrv_sessions (
+    CREATE TABLE IF NOT EXISTS hrv_sessionsUni (
         activity_id TEXT PRIMARY KEY,
         name TEXT,
         source TEXT,
@@ -70,7 +70,7 @@ def create_unified_tables():
 
     # Unified records table
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS hrv_records (
+    CREATE TABLE IF NOT EXISTS hrv_recordsUni (
         activity_id TEXT,
         name TEXT,
         record INTEGER,
@@ -116,7 +116,7 @@ def ingest_fit_file(file_path, source_hint=None):
         if msg.name == 'record':
             fields = {field.name: field.value for field in msg.fields}
             cursor.execute('''
-                INSERT OR IGNORE INTO hrv_records (
+                INSERT OR IGNORE INTO hrv_recordsUni (
                     activity_id, name, record, source, timestamp, hrv_s, hrv_btb, hrv_hr, rrhr,
                     rawHR, RRint, hrv, rmssd, sdnn, SaO2_C, stress_hrp
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -143,7 +143,7 @@ def ingest_fit_file(file_path, source_hint=None):
         elif msg.name == 'session' and not session_inserted:
             fields = {field.name: field.value for field in msg.fields}
             cursor.execute('''
-                INSERT OR IGNORE INTO hrv_sessions (
+                INSERT OR IGNORE INTO hrv_sessionsUni (
                     activity_id, name, source, timestamp, sport, min_hr, hrv_rmssd, hrv_sdrr_f,
                     hrv_sdrr_l, hrv_pnn50, hrv_pnn20, armssd, asdnn, SaO2, trnd_hrv, recovery,
                     sdnn, sdsd, dBeats, sBeats, session_hrv, NN50, NN20, sd1, sd2, lf, hf, vlf,
@@ -208,7 +208,7 @@ def establish_baseline(days=21):
     query = """
     SELECT date(timestamp) as date, AVG(armssd) as avg_rmssd, 
            AVG(asdnn) as avg_sdnn, AVG(nn50) as avg_pnn50
-    FROM hrv_sessions
+    FROM hrv_sessionsUni
     WHERE timestamp >= date('now', ?) AND armssd IS NOT NULL
     GROUP BY date(timestamp)
     ORDER BY date(timestamp) DESC
@@ -237,7 +237,7 @@ def detect_hrv_drops(baseline, days=7, drop_threshold=0.7):
     query = """
     SELECT date(timestamp) as date, AVG(armssd) as avg_rmssd,
            AVG(asdnn) as avg_sdnn, COUNT(*) as readings
-    FROM hrv_sessions
+    FROM hrv_sessionsUni
     WHERE timestamp >= date('now', ?) AND armssd IS NOT NULL
     GROUP BY date(timestamp)
     ORDER BY date(timestamp) DESC
@@ -264,7 +264,7 @@ def detect_sustained_low_hrv(baseline, days=14, consecutive_days=3):
     conn = sqlite3.connect(DB_PATH)
     query = """
     SELECT date(timestamp) as date, AVG(armssd) as avg_rmssd
-    FROM hrv_sessions
+    FROM hrv_sessionsUni
     WHERE timestamp >= date('now', ?) AND armssd IS NOT NULL
     GROUP BY date(timestamp)
     ORDER BY date(timestamp) ASC
@@ -303,7 +303,7 @@ def detect_erratic_patterns(days=14):
     query = """
     SELECT date(timestamp) as date, AVG(armssd) as avg_rmssd,
            STDEV(armssd) as std_rmssd, COUNT(*) as readings
-    FROM hrv_sessions
+    FROM hrv_sessionsUni
     WHERE timestamp >= date('now', ?) AND armssd IS NOT NULL
     GROUP BY date(timestamp)
     HAVING COUNT(*) > 1
@@ -474,7 +474,10 @@ def comprehensive_hrv_health_check():
 # --- Main Execution ---
 if __name__ == "__main__":
     create_unified_tables()
-  ###  ingest_folder("C:/smakryko/myHealthData/HealtDataSystemAnalysis/TestFitFiles/Garmin", source_hint="GARMIN")
+    # ingest_folder("C:/smakryko/myHealthData/HealtDataSystemAnalysis/TestFitFiles/Garmin", source_hint="GARMIN")
+    ingest_folder("c:/users/jheel/jheelhealthdata/fitfiles/activities", source_hint="GARMIN")
+    
+
     comprehensive_hrv_health_check()
 
     # --- HRV Trend Visualization ---

@@ -517,7 +517,10 @@ if __name__ == "__main__":
     create_unified_tables()
     # Example: ingest all .fit files from a folder
     # ingest_folder("C:/smakryko/myHealthData/HealtDataSystemAnalysis/TestFitFiles/Garmin", source_hint="GARMIN")
-    ingest_folder("C:/smakryko/myHealthData/FitFiles/Activities", source_hint="GARMIN")
+    
+    ingest_folder("c:/users/jheel/jheelhealthdata/fitfiles/activities", source_hint="GARMIN")
+    
+    # ingest_folder("C:/smakryko/myHealthData/FitFiles/Activities", source_hint="GARMIN")
     # Run analytics
     analyze_hrv_trends(days=30)
     calculate_all_recovery_scores()

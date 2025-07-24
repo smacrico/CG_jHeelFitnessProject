@@ -353,7 +353,9 @@ if __name__ == "__main__":
     # all_session_data = parse_all_fit_files_in_folder('c:/steliosdev/jheel_dev/devinout/testfit')
     # all_session_data = parse_all_fit_files_in_folder('c:/users/stma/healthdata/fitfiles/activitiesTEST')
     # all_session_data = parse_all_fit_files_in_folder('c:/users/stma/healthdata/fitfiles/activities2025')
-    all_session_data = parse_all_fit_files_in_folder('c:/smakryko/myHealthData/fitfiles/activities')
+    
+    all_session_data = parse_all_fit_files_in_folder('c:/users/jheel/jheelhealthdata/fitfiles/activities')
+    # all_session_data = parse_all_fit_files_in_folder('c:/smakryko/myHealthData/fitfiles/activities')
    
     # all_session_data = parse_all_fit_files_in_folder('C:/smakryko/myHealthData/HealtDataSystemAnalysis/TestFitFiles/Garmin')
     insert_data_into_db(all_session_data)
