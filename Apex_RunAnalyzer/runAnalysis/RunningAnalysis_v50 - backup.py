@@ -192,9 +192,6 @@ class RunningAnalysis:
             conn.close()
 
 
-            # Ensure date is datetime
-            df['date'] = pd.to_datetime(df['date'])
-
             # Calculate TRIMP
             rest_hr = 60      # Consider parameterizing these user-specific values
             max_hr = 190
@@ -223,7 +220,6 @@ class RunningAnalysis:
             print(f"Error loading data: {e}")
             return pd.DataFrame()
         
-
     def visualize_training_load(self):
         import matplotlib.pyplot as plt
 
@@ -267,6 +263,8 @@ class RunningAnalysis:
         """Create visualizations of running data"""
         try:
             plt.figure(figsize=(15, 10))
+
+            
             
             # Convert date to datetime
             self.training_log['date'] = pd.to_datetime(self.training_log['date'])
@@ -525,7 +523,11 @@ def main():
             time=27,
             heart_rate=150
         )
-        
+    
+    
+    
+    
+
     # Create metrics_breakdown table
     analysis.create_metrics_breakdown_table()
     
@@ -544,11 +546,6 @@ def main():
     
     # Calculate and print training score
     training_score = analysis.calculate_training_score()
-
-    # Visualize TRIMP
-    analysis.visualize_training_load()
-
-
     if training_score:
         print("\nTraining Score Analysis:")
         print(f"Overall Training Score: {float(training_score['overall_score']):.2f}")

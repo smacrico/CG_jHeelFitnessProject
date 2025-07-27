@@ -9,6 +9,12 @@
 
 #3 RunAnalysis ###
 & C://Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject-1/Apex_RunAnalyzer/runAnalysis/RunningAnalysis_v50.py"
+& C://Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject-1/Apex_RunAnalyzer/runAnalysis/RunningAnalysis_v6.0.py"
+
+    #interactive DashBoard 
+   
+    streamlit run app.py
+
 
 ############# HRV Analysis
 
