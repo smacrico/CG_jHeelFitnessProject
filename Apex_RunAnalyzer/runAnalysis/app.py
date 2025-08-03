@@ -47,3 +47,4 @@ if all([m in filtered_df.columns for m in metrics]):
     radar_data = pd.DataFrame(dict(r=means, theta=metrics))
     fig4 = px.line_polar(radar_data, r='r', theta='theta', line_close=True, title='Performance Radar')
     st.plotly_chart(fig4)
+ 

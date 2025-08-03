@@ -218,6 +218,12 @@ class RunningAnalysis:
             self.weekly_trimp = weekly_trimp
 
 
+            # Calculate Baseline Values
+            rhr_baseline = self.training_log['resting_hr'].dropna().mean() if 'resting_hr' in self.training_log.columns else 60
+            trimp_baseline = self.training_log['TRIMP'].rolling(window=4).mean() if 'TRIMP' in self.training_log.columns else 50
+
+
+
             return df
         except Exception as e:
             print(f"Error loading data: {e}")
@@ -304,6 +310,56 @@ class RunningAnalysis:
         except Exception as e:
             print(f"Visualization error: {e}")
     
+    def calculate_recovery_and_readiness(self):
+        df = self.training_log.copy()
+        # Fill missing subjective cols with reasonable defaults
+        df['resting_hr'] = df.get('resting_hr', pd.Series([np.nan]*len(df)))
+        df['sleep_quality'] = df.get('sleep_quality', 3)
+        df['fatigue_level'] = df.get('fatigue_level', 5)
+
+        rhr_baseline = df['resting_hr'].dropna().mean() if df['resting_hr'].notna().any() else 60
+        trimp_baseline = df['TRIMP'].rolling(window=4, min_periods=1).mean() if 'TRIMP' in df.columns else pd.Series(np.repeat(50, len(df)))
+
+        # Normalized scores (all on 0–1 scale, higher is better)
+        df['rhr_score'] = 1 - ((df['resting_hr'] - rhr_baseline) / rhr_baseline)
+        df['load_score'] = 1 - (df['TRIMP'] / (trimp_baseline + 1e-8))
+        df['sleep_score'] = df['sleep_quality'] / 5
+        df['fatigue_score'] = 1 - (df['fatigue_level'] / 10)
+
+        # Composite Recovery Score
+        df['recovery_score'] = (
+            0.3 * df['rhr_score'].fillna(1) +
+            0.3 * df['load_score'].fillna(1) +
+            0.2 * df['sleep_score'].fillna(0.6) +
+            0.2 * df['fatigue_score'].fillna(0.5)
+        )
+
+        # Readiness Score (can weight recovery more, or add freshness/load components)
+        df['readiness_score'] = (
+            0.5 * df['recovery_score'] +
+            0.3 * df['load_score'].fillna(1) +
+            0.2 * df['sleep_score'].fillna(0.6)
+        )
+
+        self.training_log = df
+        return df[['date','recovery_score','readiness_score']]
+
+
+    def visualize_recovery_and_readiness(self):
+        import matplotlib.pyplot as plt
+        self.calculate_recovery_and_readiness()
+        plt.figure(figsize=(12, 5))
+        plt.plot(self.training_log['date'], self.training_log['recovery_score'], label='Recovery')
+        plt.plot(self.training_log['date'], self.training_log['readiness_score'], label='Readiness')
+        plt.axhline(0.7, color='orange', linestyle='--', label='Caution threshold')
+        plt.xlabel('Date')
+        plt.ylabel('Score (0–1)')
+        plt.title('Recovery and Readiness Over Time')
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
+
+
     def calculate_training_zones(self, running_economy, vo2max):
         """Calculate training zones based on running economy"""
         zones = {
@@ -547,6 +603,11 @@ def main():
 
     # Visualize TRIMP
     analysis.visualize_training_load()
+
+    # Calculate and Visualize Recovery and Rediness Scores
+    analysis.calculate_recovery_and_readiness()
+    analysis.visualize_recovery_and_readiness()
+
 
 
     if training_score:
