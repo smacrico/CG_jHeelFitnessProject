@@ -8,6 +8,10 @@ import sqlite3
 from datetime import datetime
 
 class RunningAnalysis:
+
+    rest_hr = 60  # Set this to the user’s resting heart rate
+    max_hr = 170  # Set this to the user’s max HR
+    
     def __init__(self, db_path):
         self.db_path = r'g:/My Drive/Phoenix/DataBasesDev/Apex.db'  # Use consistent path
         self.training_log = self.load_training_data()
@@ -26,6 +30,8 @@ class RunningAnalysis:
             FROM running_sessions
             """
             df = pd.read_sql_query(query, conn)
+
+
             conn.close()
             return df
         except Exception as e:
@@ -184,10 +190,78 @@ class RunningAnalysis:
             """
             df = pd.read_sql_query(query, conn)
             conn.close()
+
+
+            # Ensure date is datetime
+            df['date'] = pd.to_datetime(df['date'])
+
+            # Calculate TRIMP
+            rest_hr = 60      # Consider parameterizing these user-specific values
+            max_hr = 190
+            df['duration_min'] = df['time'] / 60
+            df['hr_ratio'] = (df['heart_rate'] - rest_hr) / (max_hr - rest_hr)
+            df['TRIMP'] = df['duration_min'] * df['hr_ratio']
+
+            # Calculate weekly TRIMP load
+            df['week'] = df['date'].dt.isocalendar().week
+            weekly_trimp = (
+                df.groupby('week')['TRIMP'].sum().reset_index(name='weekly_trimp')
+            )
+            
+            # Calculate Acute (1 week) and Chronic (4 week) load & ACWR
+            weekly_trimp['acute_load'] = weekly_trimp['weekly_trimp'].rolling(window=1).mean()
+            weekly_trimp['chronic_load'] = weekly_trimp['weekly_trimp'].rolling(window=4).mean()
+            weekly_trimp['acwr'] = weekly_trimp['acute_load'] / (weekly_trimp['chronic_load'] + 1e-8)
+            
+            # Save these for later use/visualization as class attributes
+            self.training_log = df
+            self.weekly_trimp = weekly_trimp
+
+
             return df
         except Exception as e:
             print(f"Error loading data: {e}")
             return pd.DataFrame()
+        
+
+    def visualize_training_load(self):
+        import matplotlib.pyplot as plt
+
+        try:
+            if self.training_log.empty or self.weekly_trimp.empty:
+                print("No training data available for visualization.")
+                return
+
+            # Plot TRIMP per run over time
+            plt.figure(figsize=(14, 6))
+            plt.subplot(1, 2, 1)
+            plt.plot(self.training_log['date'], self.training_log['TRIMP'], marker='o', linestyle='-')
+            plt.title('TRIMP per Session Over Time')
+            plt.xlabel('Date')
+            plt.ylabel('TRIMP Score')
+            plt.xticks(rotation=45)
+
+            # Plot weekly TRIMP, Acute load, Chronic load, ACWR
+            plt.subplot(1, 2, 2)
+            weeks = self.weekly_trimp['week']
+            plt.plot(weeks, self.weekly_trimp['weekly_trimp'], label='Weekly TRIMP Load', marker='o')
+            plt.plot(weeks, self.weekly_trimp['acute_load'], label='Acute Load (1 week avg)', linestyle='--')
+            plt.plot(weeks, self.weekly_trimp['chronic_load'], label='Chronic Load (4 week avg)', linestyle='--')
+            plt.plot(weeks, self.weekly_trimp['acwr'], label='ACWR', linestyle='-.')
+            plt.axhline(1.3, color='red', linestyle=':', label='Upper ACWR Threshold (~1.3)')
+            plt.axhline(0.8, color='green', linestyle=':', label='Lower ACWR Threshold (~0.8)')
+            plt.title('Weekly Training Load and ACWR')
+            plt.xlabel('Week Number')
+            plt.ylabel('Load / Ratio')
+            plt.legend()
+            plt.grid(True)
+
+            plt.tight_layout()
+            plt.show()
+
+        except Exception as e:
+            print(f"Error during visualization: {e}")
+    
         
     def visualize_trends(self):
         """Create visualizations of running data"""
@@ -470,6 +544,11 @@ def main():
     
     # Calculate and print training score
     training_score = analysis.calculate_training_score()
+
+    # Visualize TRIMP
+    analysis.visualize_training_load()
+
+
     if training_score:
         print("\nTraining Score Analysis:")
         print(f"Overall Training Score: {float(training_score['overall_score']):.2f}")
@@ -489,6 +568,8 @@ def main():
         print("\nPerformance Trends:")
         for trend, value in training_score['performance_trends'].items():
             print(f"{trend.replace('_', ' ').title()}: {value}")
+
+    
 
     
     

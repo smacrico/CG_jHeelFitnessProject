@@ -73,8 +73,10 @@ def create_table_if_not_exists():
             hrv_pnn50 INT,                          
             hrv_pnn20 INT,
             rmssd INT,
+            aarmssd INT,
             lnrmssd INT,
             sdnn INT,
+            aasdnn INT,
             sdsd INT,
             nn50 INT,
             nn20 INT,
@@ -169,9 +171,11 @@ def parse_fit_file(file_path, activity_id):
                 hrv_pnn50 = field_dict.get('hrv_pnn50')
                 hrv_pnn20 = field_dict.get('hrv_pnn20')
                 rmssd = field_dict.get('RMSSD')
+                aarmssd = field_dict.get('armssd')
                 lnrmssd = field_dict.get('lnRMSSD')
                 sdnn = field_dict.get('SDNN')
                 sdsd = field_dict.get('SDSD')
+                aasdnn = field_dict.get('asdnn')
                 nn50 = field_dict.get('NN50')
                 nn20 = field_dict.get('NN20')
                 pnn20 = field_dict.get('pNN20')
@@ -221,8 +225,10 @@ def parse_fit_file(file_path, activity_id):
                     'hrv_pnn50' : hrv_pnn50,
                     'hrv_pnn20' : hrv_pnn20,
                     'RMSSD' : rmssd,
+                    'armssd' : aarmssd,
                     'lnRMSSD' : lnrmssd,
                     'SDNN' : sdnn,
+                    'asdnn' : aasdnn,
                     'SDSD' : sdsd,
                     'NN50' : nn50,
                     'NN20' : nn20,
@@ -274,8 +280,10 @@ def insert_data_into_db(data):
                     'hrv_pnn50',
                     'hrv_pnn20',
                     'RMSSD',
+                    'armssd',
                     'lnRMSSD',
                     'SDNN',
+                    'asdnn',
                     'SDSD',
                     'NN50',
                     'NN20',
@@ -298,12 +306,18 @@ def insert_data_into_db(data):
 
         # The activity_id does not exist in the table, so insert the new record
         cursor.execute('''
-            INSERT OR REPLACE INTO Artemistbl_Fields (activity_id, name, distance, hrv, fat, total_fat,carbs, total_carbs,  VO2maxSmooth, sport, avg_heart_rate, total_elapsed_time, steps, stress_hrpa, HR_RS_Deviation_Index ,hrv_sdrr_f, hrv_pnn50, hrv_pnn20, rmssd, lnrmssd, sdnn, sdsd, nn50, nn20, pnn20, Long, Short, Ectopic_S, hrv_rmssd, VO2maxSession, timestamp, CardiacDrift, CooperTest, SD2, SD1, HF, LF, VLF, pNN50, LFnu, HFnu, MeanHR, MeanRR, Running_Economy, aHRV, arMSSD, aSDNN)
-            VALUES (?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?)
-        ''', (session['activity_id'],session['name'], session['distance'], session['hrv'], session['fat'], session['Total Fat'],session['Carbs'], session['Total Carbs'],session['VO2maxSmooth'], session['sport'], 
+            INSERT OR REPLACE INTO Artemistbl_Fields (activity_id, name, distance, hrv, fat, total_fat,carbs, total_carbs,  VO2maxSmooth, sport, avg_heart_rate, total_elapsed_time, steps, stress_hrpa, HR_RS_Deviation_Index ,hrv_sdrr_f, hrv_pnn50, hrv_pnn20, rmssd, aarmssd, lnrmssd, sdnn, aasdnn, sdsd, nn50, nn20, pnn20, Long, Short, Ectopic_S, hrv_rmssd, VO2maxSession, timestamp, CardiacDrift, CooperTest, SD2, SD1, HF, LF, VLF, pNN50, LFnu, HFnu, MeanHR, MeanRR, Running_Economy, aHRV, arMSSD, aSDNN)
+            VALUES (?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?)
+        ''', (session['activity_id'],session['name'], session['distance'], session['hrv'],
+              session['fat'], session['Total Fat'],session['Carbs'], session['Total Carbs'],
+              session['VO2maxSmooth'], session['sport'], 
               session['avg_heart_rate'], session['total_elapsed_time'],
-              session['Steps'], session['stress_hrpa'], session['HR-RS_Deviation Index'],session['hrv_sdrr_f'], session['hrv_pnn50'], session['hrv_pnn20'], session['RMSSD'], session['lnRMSSD'], session['SDNN'], session['SDSD'], session['NN50'], session['NN20'], session['pnn20'], session['Long'], session['Short'], session['Ectopic_S'], session['hrv_rmssd'], session['VO2maxSession'], 
-              session ['timestamp'],session['CardiacDrift'], session['CooperTest'], session['SD2'], session['SD1'], session['HF'] , session['LF'], session['LF'], session['pNN50'], session['LFnu'], session['HFnu'],
+              session['Steps'], session['stress_hrpa'], session['HR-RS_Deviation Index'],session['hrv_sdrr_f'],
+              session['hrv_pnn50'], session['hrv_pnn20'], session['RMSSD'], session['armssd'] ,session['lnRMSSD'], 
+              session['SDNN'], session['asdnn'],session['SDSD'], session['NN50'], session['NN20'], session['pnn20'], 
+              session['Long'], session['Short'], session['Ectopic_S'], session['hrv_rmssd'], session['VO2maxSession'], 
+              session ['timestamp'],session['CardiacDrift'], session['CooperTest'], session['SD2'], session['SD1'], 
+              session['HF'] , session['LF'], session['LF'], session['pNN50'], session['LFnu'], session['HFnu'],
               session['MeanRR'], session['MeanHR'], session['Running Economy'], session['aHRV'], session['arMSSD'], session['aSDNN']))
 
     conn.commit()
@@ -339,8 +353,11 @@ if __name__ == "__main__":
     # all_session_data = parse_all_fit_files_in_folder('c:/steliosdev/jheel_dev/devinout/testfit')
     # all_session_data = parse_all_fit_files_in_folder('c:/users/stma/healthdata/fitfiles/activitiesTEST')
     # all_session_data = parse_all_fit_files_in_folder('c:/users/stma/healthdata/fitfiles/activities2025')
-    # all_session_data = parse_all_fit_files_in_folder('c:/users/jheel/jheelhealthdata/fitfiles/activities')
-    all_session_data = parse_all_fit_files_in_folder('C:/smakryko/myHealthData/HealtDataSystemAnalysis/TestFitFiles/Garmin')
+    
+    all_session_data = parse_all_fit_files_in_folder('c:/users/jheel/jheelhealthdata/fitfiles/activities')
+    # all_session_data = parse_all_fit_files_in_folder('c:/smakryko/myHealthData/fitfiles/activities')
+   
+    # all_session_data = parse_all_fit_files_in_folder('C:/smakryko/myHealthData/HealtDataSystemAnalysis/TestFitFiles/Garmin')
     insert_data_into_db(all_session_data)
     logging.info('All data inserted successfully.')
     print('All data inserted successfully.')
