@@ -7,7 +7,7 @@
 # JUly 7th, 2025
 
 
-& C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject-1/GarminParse_PlugIn/jHeel_plugin v5.1 dev.py"
+& C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/GarminParse_PlugIn/jHeel_plugin v5.1 dev.py"
 
 & C:/Users/XP222SP/AppData/Local/Programs/Python/Python312/python.exe "C:/smakryko/myHealthData/CG_jHeelFitnessProject/GarminParse_PlugIn/jHeel_plugin v5.1 dev.py"
 

@@ -37,7 +37,7 @@ def create_table_if_not_exists():
     
     # Use the absolute path to the database file """this is the testing enviroment EY laptop"""
     
-    conn = sqlite3.connect(r'c:/smakryko/myHealthData/DataBasesDev/artemisDEV.db')
+    conn = sqlite3.connect(r'c:/smakrykoDBs/artemisDEV.db')
 
    
     cursor = conn.cursor()
@@ -91,7 +91,7 @@ def create_table_if_not_exists():
             HF INT,
             VLF INT,
             pNN50 INT, 
-            LFnu INT, HFnu INT,MeanHR INT, MeanRR INT, Running_Economy TXT, aHRV INT, arMSSD INT, aSDNN INT
+            LFnu INT, HFnu INT,MeanHR INT, MeanRR INT, Running_Economy TXT, aHRV INT, arMSSD INT, aSDNN INT, calories INT
         )
     ''')
     
@@ -197,6 +197,7 @@ def parse_fit_file(file_path, activity_id):
                 aHRV = field_dict.get('aHRV')
                 arMSSD = field_dict.get('arMSSD')
                 aSDNN = field_dict.get('aSDNN')
+                calories = field_dict.get('calories')
 
                 if steps is None:
                     steps = field_dict.get('steps')
@@ -250,7 +251,8 @@ def parse_fit_file(file_path, activity_id):
                     'Running Economy' : Running_Economy,
                     'aHRV' : aHRV,
                     'arMSSD' : arMSSD,
-                    'aSDNN' : aSDNN
+                    'aSDNN' : aSDNN,
+                    'calories' : calories
 
                 })
                 
@@ -262,7 +264,7 @@ def parse_fit_file(file_path, activity_id):
 # Insert the session data into the database
 
 def insert_data_into_db(data):
-    conn = sqlite3.connect('c:/smakryko/myHealthData/DataBasesDev/artemisDEV.db')
+    conn = sqlite3.connect('c:/smakrykoDBs/artemisDEV.db')
     # conn = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis.db')
     cursor = conn.cursor()
 
@@ -296,7 +298,7 @@ def insert_data_into_db(data):
                     'SD1',
                     'LF',
                     'HF',
-                    'VLF','pNN50','LFnu','HFnu','MeanHR', 'MeanRR', 'Running Economy', 'aHRV', 'arMSSD', 'aSDNN']  # Replace with your specific fields
+                    'VLF','pNN50','LFnu','HFnu','MeanHR', 'MeanRR', 'Running Economy', 'aHRV', 'arMSSD', 'aSDNN','calories']  # Replace with your specific fields
     # Loop through each session in the data
     for session in data:
         # Check if all specific fields in the session dictionary are None
@@ -306,8 +308,8 @@ def insert_data_into_db(data):
 
         # The activity_id does not exist in the table, so insert the new record
         cursor.execute('''
-            INSERT OR REPLACE INTO Artemistbl_Fields (activity_id, name, distance, hrv, fat, total_fat,carbs, total_carbs,  VO2maxSmooth, sport, avg_heart_rate, total_elapsed_time, steps, stress_hrpa, HR_RS_Deviation_Index ,hrv_sdrr_f, hrv_pnn50, hrv_pnn20, rmssd, aarmssd, lnrmssd, sdnn, aasdnn, sdsd, nn50, nn20, pnn20, Long, Short, Ectopic_S, hrv_rmssd, VO2maxSession, timestamp, CardiacDrift, CooperTest, SD2, SD1, HF, LF, VLF, pNN50, LFnu, HFnu, MeanHR, MeanRR, Running_Economy, aHRV, arMSSD, aSDNN)
-            VALUES (?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?)
+            INSERT OR REPLACE INTO Artemistbl_Fields (activity_id, name, distance, hrv, fat, total_fat,carbs, total_carbs,  VO2maxSmooth, sport, avg_heart_rate, total_elapsed_time, steps, stress_hrpa, HR_RS_Deviation_Index ,hrv_sdrr_f, hrv_pnn50, hrv_pnn20, rmssd, aarmssd, lnrmssd, sdnn, aasdnn, sdsd, nn50, nn20, pnn20, Long, Short, Ectopic_S, hrv_rmssd, VO2maxSession, timestamp, CardiacDrift, CooperTest, SD2, SD1, HF, LF, VLF, pNN50, LFnu, HFnu, MeanHR, MeanRR, Running_Economy, aHRV, arMSSD, aSDNN, calories)
+            VALUES (?,?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?)
         ''', (session['activity_id'],session['name'], session['distance'], session['hrv'],
               session['fat'], session['Total Fat'],session['Carbs'], session['Total Carbs'],
               session['VO2maxSmooth'], session['sport'], 
@@ -318,7 +320,7 @@ def insert_data_into_db(data):
               session['Long'], session['Short'], session['Ectopic_S'], session['hrv_rmssd'], session['VO2maxSession'], 
               session ['timestamp'],session['CardiacDrift'], session['CooperTest'], session['SD2'], session['SD1'], 
               session['HF'] , session['LF'], session['LF'], session['pNN50'], session['LFnu'], session['HFnu'],
-              session['MeanRR'], session['MeanHR'], session['Running Economy'], session['aHRV'], session['arMSSD'], session['aSDNN']))
+              session['MeanRR'], session['MeanHR'], session['Running Economy'], session['aHRV'], session['arMSSD'], session['aSDNN'], session['calories']))
 
     conn.commit()
     conn.close()
@@ -328,7 +330,7 @@ def create_view_if_not_exists():
     # conn = sqlite3.connect('c:/users/stma/healthdata/dbs/garmin_activities.db')
     # conn = sqlite3.connect('c:/users/stma/healthdata/dbs/garmin_activities.db')
     # conn = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis.db')
-    conn = sqlite3.connect('c:/smakryko/myHealthData/DataBasesDev/artemisDEV.db')
+    conn = sqlite3.connect('c:/smakrykoDBs/artemisDEV.db')
     cursor = conn.cursor()
 
     cursor.execute('''
