@@ -9,7 +9,7 @@ from fitparse import FitFile
 # --- Configuration ---
 
 # --- DB Name and Log Path --- "Mercury_DWH-HRV.db"
-DB_PATH = "c:/smakrykoDBs/Mercury_DWH-HRV.db"
+DB_PATH = "c:/smakrykoDBs/Mercury_DWH_HRV.db"
 LOG_PATH = "c:/temp/logsDWH/hrv_unified.log"
 
 # Setup logging
@@ -96,8 +96,232 @@ def create_unified_tables():
     conn.close()
     logging.info("Unified tables created.")
 
-# --- Data Ingestion ---
+
+# -- Data Ingestion
+
 def ingest_fit_file(file_path, source_hint=None):
+    from fitparse import FitFile
+    import os
+    import sqlite3
+    import logging
+
+    # Allowed sport names (lowercase for case-insensitive match)
+    ALLOWED_NAMES = ["hrv", "f3b monitor+hrv", "meditation"]
+
+    # Parse FIT file
+    fit_file = FitFile(file_path)
+    activity_id = os.path.splitext(os.path.basename(file_path))[0].split('_')
+    source = source_hint or "UNKNOWN"
+    session_inserted = False
+    name = None
+    record_num = 0
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    for msg in fit_file.messages:
+
+        if msg.name == 'sport':
+            fields = {field.name: field.value for field in msg.fields}
+            name = fields.get('name')
+            if name:
+                name = name.strip()
+
+            # Skip entire file if sport name not in allowed list
+            if not name or name.lower() not in ALLOWED_NAMES:
+                logging.info(f"Skipping file {file_path} because name '{name}' not in allowed list")
+                break
+
+        if msg.name == 'record' and name and name.lower() in ALLOWED_NAMES:
+            fields = {field.name: field.value for field in msg.fields}
+            cursor.execute('''
+                INSERT OR IGNORE INTO hrv_records (
+                    activity_id, name, record, source, timestamp, hrv_s, hrv_btb, hrv_hr, rrhr,
+                    rawHR, RRint, hrv, rmssd, sdnn, SaO2_C, stress_hrp
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                activity_id,
+                name,
+                record_num,
+                source,
+                fields.get('timestamp'),
+                fields.get('hrv_s'),
+                fields.get('hrv_btb'),
+                fields.get('hrv_hr'),
+                fields.get('rrhr'),
+                fields.get('rawHR'),
+                fields.get('RRint'),
+                fields.get('hrv'),
+                fields.get('rmssd'),
+                fields.get('SDNN'),
+                fields.get('SaO2_C'),
+                fields.get('stress_hrp')
+            ))
+            record_num += 1
+
+        elif msg.name == 'session' and not session_inserted and name and name.lower() in ALLOWED_NAMES:
+            fields = {field.name: field.value for field in msg.fields}
+            cursor.execute('''
+                INSERT OR IGNORE INTO hrv_sessions (
+                    activity_id, name, source, timestamp, sport, min_hr, hrv_rmssd, hrv_sdrr_f,
+                    hrv_sdrr_l, hrv_pnn50, hrv_pnn20, armssd, asdnn, SaO2, trnd_hrv, recovery,
+                    sdnn, sdsd, dBeats, sBeats, session_hrv, NN50, NN20, sd1, sd2, lf, hf, vlf,
+                    pNN50, lf_nu, hf_nu, mean_hr, mean_rr, stress_hrpa, steps, distance, vo2max
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                activity_id,
+                name,
+                source,
+                fields.get('timestamp'),
+                fields.get('sport'),
+                fields.get('min_hr'),
+                fields.get('hrv_rmssd'),
+                fields.get('hrv_sdrr_f'),
+                fields.get('hrv_sdrr_l'),
+                fields.get('hrv_pnn50'),
+                fields.get('hrv_pnn20'),
+                fields.get('armssd'),
+                fields.get('asdnn'),
+                fields.get('SaO2'),
+                fields.get('trnd_hrv'),
+                fields.get('recovery'),
+                fields.get('SDNN'),
+                fields.get('SDSD'),
+                fields.get('dBeats'),
+                fields.get('sBeats'),
+                fields.get('session_hrv'),
+                fields.get('NN50'),
+                fields.get('NN20'),
+                fields.get('SD1'),
+                fields.get('SD2'),
+                fields.get('LF'),
+                fields.get('HF'),
+                fields.get('VLF'),
+                fields.get('pNN50'),
+                fields.get('LFnu'),
+                fields.get('HFnu'),
+                fields.get('Mean HR'),
+                fields.get('Mean RR'),
+                fields.get('stress_hrpa'),
+                fields.get('steps'),
+                fields.get('total_distance'),
+                fields.get('VO2maxSession')
+            ))
+            session_inserted = True
+
+    conn.commit()
+    conn.close()
+    logging.info(f"Ingested file: {file_path}")
+
+
+
+def ingest_fit_fileFORHRVVV(file_path, source_hint=None):
+    fit_file = FitFile(file_path)
+    activity_id = os.path.splitext(os.path.basename(file_path))[0].split('_')[0]
+    source = source_hint or "UNKNOWN"
+    session_inserted = False
+    name = None
+    record_num = 0
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    for msg in fit_file.messages:
+
+        if msg.name == 'sport':
+            fields = {field.name: field.value for field in msg.fields}
+            name = fields.get('name')  # e.g., "HRV", "Cycling", etc.
+            if name:
+                name = name.strip()
+            # If sport name is not exactly HRV (case-insensitive), skip everything
+            if not name or name.lower() != "hrv":
+                logging.info(f"Skipping file {file_path} because name '{name}' != 'HRV'")
+                break
+
+        if msg.name == 'record' and name and name.lower() == "hrv":
+            fields = {field.name: field.value for field in msg.fields}
+            cursor.execute('''
+                INSERT OR IGNORE INTO hrv_records (
+                    activity_id, name, record, source, timestamp, hrv_s, hrv_btb, hrv_hr, rrhr,
+                    rawHR, RRint, hrv, rmssd, sdnn, SaO2_C, stress_hrp
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                activity_id,
+                name,
+                record_num,
+                source,
+                fields.get('timestamp'),
+                fields.get('hrv_s'),
+                fields.get('hrv_btb'),
+                fields.get('hrv_hr'),
+                fields.get('rrhr'),
+                fields.get('rawHR'),
+                fields.get('RRint'),
+                fields.get('hrv'),
+                fields.get('rmssd'),
+                fields.get('SDNN'),
+                fields.get('SaO2_C'),
+                fields.get('stress_hrp')
+            ))
+            record_num += 1
+
+        elif msg.name == 'session' and not session_inserted and name and name.lower() == "hrv":
+            fields = {field.name: field.value for field in msg.fields}
+            cursor.execute('''
+                INSERT OR IGNORE INTO hrv_sessions (
+                    activity_id, name, source, timestamp, sport, min_hr, hrv_rmssd, hrv_sdrr_f,
+                    hrv_sdrr_l, hrv_pnn50, hrv_pnn20, armssd, asdnn, SaO2, trnd_hrv, recovery,
+                    sdnn, sdsd, dBeats, sBeats, session_hrv, NN50, NN20, sd1, sd2, lf, hf, vlf,
+                    pNN50, lf_nu, hf_nu, mean_hr, mean_rr, stress_hrpa, steps, distance, vo2max
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                activity_id,
+                name,
+                source,
+                fields.get('timestamp'),
+                fields.get('sport'),
+                fields.get('min_hr'),
+                fields.get('hrv_rmssd'),
+                fields.get('hrv_sdrr_f'),
+                fields.get('hrv_sdrr_l'),
+                fields.get('hrv_pnn50'),
+                fields.get('hrv_pnn20'),
+                fields.get('armssd'),
+                fields.get('asdnn'),
+                fields.get('SaO2'),
+                fields.get('trnd_hrv'),
+                fields.get('recovery'),
+                fields.get('SDNN'),
+                fields.get('SDSD'),
+                fields.get('dBeats'),
+                fields.get('sBeats'),
+                fields.get('session_hrv'),
+                fields.get('NN50'),
+                fields.get('NN20'),
+                fields.get('SD1'),
+                fields.get('SD2'),
+                fields.get('LF'),
+                fields.get('HF'),
+                fields.get('VLF'),
+                fields.get('pNN50'),
+                fields.get('LFnu'),
+                fields.get('HFnu'),
+                fields.get('Mean HR'),
+                fields.get('Mean RR'),
+                fields.get('stress_hrpa'),
+                fields.get('steps'),
+                fields.get('total_distance'),
+                fields.get('VO2maxSession')
+            ))
+            session_inserted = True
+
+    conn.commit()
+    conn.close()
+    logging.info(f"Ingested file: {file_path}")
+
+
+# --- Data Ingestion OLDer version---
+def ingest_fit_file_OLDVersion(file_path, source_hint=None):
     fit_file = FitFile(file_path)
     activity_id = os.path.splitext(os.path.basename(file_path))[0].split('_')[0]
     source = source_hint or "UNKNOWN"

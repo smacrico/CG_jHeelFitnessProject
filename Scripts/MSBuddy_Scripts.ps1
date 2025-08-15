@@ -17,6 +17,12 @@
 & C://Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/Apex_RunAnalyzer/runAnalysis/RunningAnalysis_v50.py"
 & C://Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/Apex_RunAnalyzer/runAnalysis/RunningAnalysis_v6.0.py"
 
+
+    #interactive DashBoard - Run Analysis
+   
+    streamlit run app.py
+
+
     #interactive DashBoard - Garmin Health Data
    
     streamlit run app/main.py
@@ -28,8 +34,14 @@
 ##Main HRV Analysis
 & C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/MSBuddy_FitnessApp/HRV_DWH/HRV_Analysis_V1.0.py"
 
+***********************************************************************************************************************************
+******************
 & C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/MSBuddy_FitnessApp/HRV_DWH/HRV_datawarehouse_V1.5.py"
 & C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/MSBuddy_FitnessApp/HRV_DWH/HRV_datawarehouse V1.9.py"
+******************
+***********************************************************************************************************************************
+
+
 
 #unifiedScript
 & C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/MSBuddy_FitnessApp/HRV_DWH/HRV_datawarehouse V1.95.py"
@@ -37,5 +49,5 @@
 
 ############next scripts
 
-& C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject-1/MSBuddy_FitnessApp/HRV Patern Detection v1.0.py"
+& C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/MSBuddy_FitnessApp/HRV Patern Detection v1.0.py"
 
