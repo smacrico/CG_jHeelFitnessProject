@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
-from hrv_analytics_v2 import HRVAnalytics
+from HRV_dwhAnalytics_v2 import HRVAnalytics
 
 # --- Initialize Analytics ---
 hrv = HRVAnalytics("Mercury_DWH-HRV.db")

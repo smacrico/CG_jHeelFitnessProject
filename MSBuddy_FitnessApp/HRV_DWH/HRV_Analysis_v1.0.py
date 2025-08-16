@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Configuration
-DB_PATH = "c:/smakrykoDBs/Mercury_DWH-HRV.db"
+DB_PATH = "c:/smakrykoDBs/Mercury_DWH_HRV.db"
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)

@@ -12,14 +12,14 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import sqlite3
-from hrv_analytics_v2 import HRVAnalytics  # Import our analytics class
+from HRV_dwhAnalytics_v2 import HRVAnalytics  # Import our analytics class
 
 # Initialize the dashboard
 app = dash.Dash(__name__)
 app.title = "HRV Analytics Dashboard"
 
 # Initialize HRV Analytics
-hrv_analytics = HRVAnalytics("Mercury_DWH-HRV.db")
+hrv_analytics = HRVAnalytics("c:/smakrykoDBs/Mercury_DWH_HRV.db")
 
 # Define the dashboard layout
 app.layout = html.Div([
@@ -473,4 +473,4 @@ def create_statistics_table(statistics):
     return table
 
 if __name__ == '__main__':
-    app.run_server(debug=True, host='0.0.0.0', port=8050)
+    app.run(debug=True, host='0.0.0.0', port=8050)

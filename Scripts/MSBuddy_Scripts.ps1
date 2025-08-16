@@ -31,6 +31,14 @@
 ############# HRV Analysis
 
 & C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/MSBuddy_FitnessApp/HRV_DWH/HRV_datawarehouse.py"
+
+& C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/MSBuddy_FitnessApp/HRV_DWH/scripts/HRV_dwhAnalytics_v2.py"
+
+***********************************************************************************************************************************
+***********************************************************************************************************************************
+***********************************************************************************************************************************
+
+
 ##Main HRV Analysis
 & C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/MSBuddy_FitnessApp/HRV_DWH/HRV_Analysis_V1.0.py"
 

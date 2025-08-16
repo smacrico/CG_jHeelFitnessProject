@@ -148,5 +148,49 @@ Normal range: 31.8 - 39.3
 --- Recent HRV Drops ---
 Detecting HRV drops over the last 14 days...
 
+========================================================RESULTS=========16 August 2025=================================
+=====================================================================================================================
+& C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/MSBuddy_FitnessApp/HRV_DWH/scripts/HRV_dwhAnalytics_v2.py"
+========================================================
+=== HRV Analytics Demo ===
+
+1. Analyzing HRV trends...
+Data points: 30
+Date range: 2025-07-18 to 2025-08-16
+
+Current HRV values:
+  RMSSD: 44.0
+  SDNN: 41.0
+  PNN50: 10.6
+
+Recovery Scores:
+  Simple: 35.9/100
+  Comprehensive: 100.0/100
+  Personalized: 90.4/100
+
+Trend Analysis:
+  Simple Recovery: improving (moderate)
+  Comprehensive Recovery: stable (weak)
+  Personalized Recovery: improving (weak)
 
 
+=====================================================================================================================
+& C:/Python313/python.exe "C:/smakrykoDev/GitHubRepos/CG_jHeelFitnessProject/MSBuddy_FitnessApp/HRV_DWH/HRV_Analysis_V1.0.py"
+========================================================
+
+
+=== HRV TREND ANALYSIS REPORT ===
+Period: 2025-07-17 to 2025-08-16 (31 days)
+RMSSD: improving (weak), slope=0.175, correlation=0.289
+SDNN: improving (weak), slope=0.310, correlation=0.310
+RMSSD recent change: +4.1%
+SDNN recent change: +7.7%
+
+
+=== HRV TREND ANALYSIS REPORT ===
+Period: 2025-07-17 to 2025-08-16 (31 days)
+RMSSD: improving (weak), slope=0.175, correlation=0.289
+SDNN: improving (weak), slope=0.310, correlation=0.310
+RMSSD recent change: +4.1%
+SDNN recent change: +7.7%
+{'activity_id': '17080654324', 'name': 'F3b Monitor+HRV', 'method': 'simple', 'recovery_score': 15.758150736490885} None None
