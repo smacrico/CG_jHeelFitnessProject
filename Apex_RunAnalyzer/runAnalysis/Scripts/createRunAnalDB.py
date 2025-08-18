@@ -32,21 +32,14 @@ create_table_if_not_exists()
     
 try:
     # Establish connections to both databases
-    # conn_artemis = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis.db')
-    conn_artemis = sqlite3.connect('c:/smakrykoDBs/artemisDEV.db')
-    
+    conn_artemis = sqlite3.connect('c:/smakrykoDBs/artemis.db')
     conn_running_analysis = sqlite3.connect('c:/smakrykoDBs/Apex.db')
 
     # Create cursors
     cursor_artemis = conn_artemis.cursor()
     cursor_running_analysis = conn_running_analysis.cursor()
     
-    
-    
-
     # Select the specific columns from Artemis database
-    # FROM Artemistbl_Prod prod
-    # FROM Artemistbl_mariner
     cursor_artemis.execute('''
         SELECT running_economy, timestamp, distance, sport, vo2maxsession,  cardiacdrift, avg_heart_rate, total_elapsed_time
         FROM Artemistbl_fields

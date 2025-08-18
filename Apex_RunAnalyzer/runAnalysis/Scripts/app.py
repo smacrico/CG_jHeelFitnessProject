@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-from RunningAnalysis_v50 import RunningAnalysis
+from Apex_RunAnalyzer.runAnalysis.Scripts.createRunAnalDB import RunningAnalysis
 @st.cache_data
 def get_analysis():
     analysis = RunningAnalysis('g:/My Drive/Phoenix/DataBasesDev/Apex.db')

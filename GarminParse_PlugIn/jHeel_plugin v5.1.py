@@ -1,4 +1,3 @@
-
 # this file is used to parse the fit file and store the dev_data in the database
 """ stelios (c) steliosmacrico "jHeel 2024 creating plugin"""
 
@@ -22,22 +21,19 @@ now = datetime.datetime.now()
 timestamp = now.strftime('%Y%m%d_%H%M%S')
 
 # Include the timestamp in the log file name
-logging.basicConfig(filename=f'c:/temp/logsDEV/jheel_parse_Fields-v5{timestamp}.log', level=logging.INFO)
+logging.basicConfig(filename=f'c:/temp/logsFitnessApp/jheel_parse_Fields-v5{timestamp}.log', level=logging.INFO)
 
 # Include the timestamp in the log file name
 logging.info('Starting script...')
 print('Starting script...')
 
 # Set up the database connection
-# database_path = os.path.abspath('c:/users/stma/healthdata/dbs/garmin_activities.db')
-# database_path = os.path.abspath('e:/jheel_dev/DataBasesDev/artemis.db')
  
 def create_table_if_not_exists():
-    # conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/artemis.db')
-    
+  
     # Use the absolute path to the database file """this is the testing enviroment EY laptop"""
     
-    conn = sqlite3.connect(r'c:/smakrykoDBs/artemisDEV.db')
+    conn = sqlite3.connect(r'c:/smakrykoDBs/artemis.db')
 
    
     cursor = conn.cursor()
@@ -265,7 +261,7 @@ def parse_fit_file(file_path, activity_id):
 # Insert the session data into the database
 
 def insert_data_into_db(data):
-    conn = sqlite3.connect('c:/smakrykoDBs/artemisDEV.db')
+    conn = sqlite3.connect('c:/smakrykoDBs/artemis.db')
     # conn = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis.db')
     cursor = conn.cursor()
 
@@ -331,7 +327,7 @@ def create_view_if_not_exists():
     # conn = sqlite3.connect('c:/users/stma/healthdata/dbs/garmin_activities.db')
     # conn = sqlite3.connect('c:/users/stma/healthdata/dbs/garmin_activities.db')
     # conn = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis.db')
-    conn = sqlite3.connect('c:/smakrykoDBs/artemisDEV.db')
+    conn = sqlite3.connect('c:/smakrykoDBs/artemis.db')
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -353,14 +349,8 @@ if __name__ == "__main__":
     create_table_if_not_exists()
     # create_view()
     create_view_if_not_exists()
-    # all_session_data = parse_all_fit_files_in_folder('c:/steliosdev/jheel_dev/devinout/testfit')
     # all_session_data = parse_all_fit_files_in_folder('c:/users/stma/healthdata/fitfiles/activitiesTEST')
-    # all_session_data = parse_all_fit_files_in_folder('c:/users/stma/healthdata/fitfiles/activities2025')
-    
     all_session_data = parse_all_fit_files_in_folder('c:/users/jheel/jheelhealthdata/fitfiles/activities')
-    # all_session_data = parse_all_fit_files_in_folder('c:/smakryko/myHealthData/fitfiles/activities')
-   
-    # all_session_data = parse_all_fit_files_in_folder('C:/smakryko/myHealthData/HealtDataSystemAnalysis/TestFitFiles/Garmin')
     insert_data_into_db(all_session_data)
     logging.info('All data inserted successfully.')
     print('All data inserted successfully.')
