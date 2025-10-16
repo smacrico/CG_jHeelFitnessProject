@@ -36,8 +36,12 @@ def create_table_if_not_exists():
     # conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/artemis.db')
     
     # Use the absolute path to the database file """this is the testing enviroment EY laptop"""
+
     
     conn = sqlite3.connect(r'c:/smakrykoDBs/artemisDEV.db')
+
+   
+
 
    
     cursor = conn.cursor()
