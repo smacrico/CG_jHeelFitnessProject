@@ -9,7 +9,7 @@ from fitparse import FitFile
 # --- Configuration ---
 
 # --- DB Name and Log Path --- "Mercury_DWH-HRV.db"
-DB_PATH = "c:/smakryko/myHealthData/DataBasesDev/Mercury_DWH-HRV.db"
+DB_PATH = "c:/smakrykoDBs/Mercury_DWH_HRV.db"
 LOG_PATH = "c:/temp/logsDWH/hrv_unified.log"
 
 # Setup logging
@@ -96,34 +96,40 @@ def create_unified_tables():
     conn.close()
     logging.info("Unified tables created.")
 
-# --- Data Ingestion ---
+
+# -- Data Ingestion
 def ingest_fit_file(file_path, source_hint=None):
     fit_file = FitFile(file_path)
     activity_id = os.path.splitext(os.path.basename(file_path))[0].split('_')[0]
     source = source_hint or "UNKNOWN"
     session_inserted = False
+    name = None
+    record_num = 0
+
+    allowed_names = ["hrv", "f3b monitor+hrv", "meditation"]
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    record_num = 0
 
     for msg in fit_file.messages:
-        
-        
+
         if msg.name == 'sport':
-                fields = msg.fields
-                field_dict = {field.name: field.value for field in fields}
-                
-                name = field_dict.get('name')
-                
-                
-        if msg.name == 'record':
+            fields = {field.name: field.value for field in msg.fields}
+            name = fields.get('name')  # e.g., "HRV", "Cycling", etc.
+            if name:
+                name = name.strip()
+            # Skip everything if sport name not in allowed list
+            if not name or name.lower() not in allowed_names:
+                logging.info(f"Skipping file {file_path} because name '{name}' not in {allowed_names}")
+                break
+
+        if msg.name == 'record' and name and name.lower() in allowed_names:
             fields = {field.name: field.value for field in msg.fields}
             cursor.execute('''
                 INSERT OR IGNORE INTO hrv_records (
                     activity_id, name, record, source, timestamp, hrv_s, hrv_btb, hrv_hr, rrhr,
                     rawHR, RRint, hrv, rmssd, sdnn, SaO2_C, stress_hrp
-                ) VALUES (?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 activity_id,
                 name,
@@ -144,7 +150,7 @@ def ingest_fit_file(file_path, source_hint=None):
             ))
             record_num += 1
 
-        elif msg.name == 'session' and not session_inserted:
+        elif msg.name == 'session' and not session_inserted and name and name.lower() in allowed_names:
             fields = {field.name: field.value for field in msg.fields}
             cursor.execute('''
                 INSERT OR IGNORE INTO hrv_sessions (
@@ -198,11 +204,12 @@ def ingest_fit_file(file_path, source_hint=None):
     conn.close()
     logging.info(f"Ingested file: {file_path}")
 
+
 def ingest_folder(folder_path, source_hint=None):
     for filename in os.listdir(folder_path):
         if filename.lower().endswith('.fit'):
             try:
-                ingest_fit_file(os.path.join(folder_path, filename), source_hint)
+                 ingest_fit_file(os.path.join(folder_path, filename), source_hint)
             except Exception as e:
                 logging.error(f"Failed to ingest {filename}: {e}")
 
@@ -215,7 +222,7 @@ def ingest_folder(folder_path, source_hint=None):
 def analyze_hrv_trends(days=30):
     conn = sqlite3.connect(DB_PATH)
     query = """
-    SELECT date(timestamp) as date, AVG(armssd) as avg_rmssd, AVG(asdnn) as avg_sdnn
+    SELECT date(timestamp) as date, AVG(hrv_armssd) as avg_rmssd, AVG(sdnn) as avg_sdnn
     FROM hrv_sessions
     WHERE timestamp >= date('now', ?) and name is 'F3b Monitor+HRV'
     GROUP BY date(timestamp)

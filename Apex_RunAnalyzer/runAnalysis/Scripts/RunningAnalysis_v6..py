@@ -6,6 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sqlite3
 from datetime import datetime
+import streamlit as st
+
+
 
 class RunningAnalysis:
 
@@ -13,14 +16,14 @@ class RunningAnalysis:
     max_hr = 170  # Set this to the user’s max HR
     
     def __init__(self, db_path):
-        self.db_path = r'g:/My Drive/Phoenix/DataBasesDev/Apex.db'  # Use consistent path
+        self.db_path = r'c:/smakrykoDBs/Apex.db'  # Use consistent path
         self.training_log = self.load_training_data()
     
     def load_training_data(self):
         """Load training data from SQLite database"""
         try:
             # conn = sqlite3.connect(self.db_path)
-            conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/Apex.db')
+            conn = sqlite3.connect(r'c:/smakrykoDBs/Apex.db')
             query = """
             SELECT date, running_economy, vo2max, distance, 
                    time, 
@@ -61,7 +64,7 @@ class RunningAnalysis:
     def save_training_log_to_db(self):
         """Save training log DataFrame to SQLite database"""
         try:
-            conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/Apex.db')
+            conn = sqlite3.connect(r'c:/smakrykoDBs/Apex.db')
             
             # Create a new table for training logs if it doesn't exist
             self.training_log.to_sql('training_logs', 
@@ -175,7 +178,7 @@ class RunningAnalysis:
         
     def load_training_data(self):
         try:
-            conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/Apex.db')
+            conn = sqlite3.connect(r'c:/smakrykoDBs/Apex.db')
             query = """
             SELECT 
                 date,
@@ -564,12 +567,46 @@ class RunningAnalysis:
             print(f"Error calculating training score: {e}")
             return None 
 
+    def visualize_score_impact_over_time(self, extra_scores=None):
+        """
+        Visualizes different scoring systems over time.
+        extra_scores: dict, e.g. {'Recovery Score': 'recovery_score', 'Readiness': 'readiness_score'}
+        """
+        import matplotlib.pyplot as plt
+
+        # Ensure dates are sorted and converted
+        df = self.training_log.sort_values('date').copy()
+        df['date'] = pd.to_datetime(df['date'])
+
+        plt.figure(figsize=(14,7))
+
+        # Plot the overall training score (current main score)
+        training_score_result = self.calculate_training_score()
+        # Assume you store a time series of scores; otherwise, recalculate for each row
+        df['Overall Score'] = self.calculate_training_score()['overall_score']  # If per-session, else plot as flat line
+
+        # Plot the score(s) over time
+        plt.plot(df['date'], df['Overall Score'], label="Overall Training Score", linewidth=2)
+
+        # Overlay additional scoring methods, if provided
+        if extra_scores:
+            for label, col in extra_scores.items():
+                if col in df.columns:
+                    plt.plot(df['date'], df[col], linestyle='--', label=label)
+
+        plt.xlabel('Date')
+        plt.ylabel('Score')
+        plt.title('Comparison of Scoring Calculations Over Time')
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
+
 def main():
     # Database path
-    db_path = 'g:/My Drive/Phoenix/DataBasesDev/Apex.db'
+    db_path = 'c:/smakrykoDBs/Apex.db'
 
     # Create analysis object
-    analysis = RunningAnalysis('g:/My Drive/Phoenix/DataBasesDev/Apex.db')
+    analysis = RunningAnalysis('c:/smakrykoDBs/Apex.db')
     
     # Add sample session if database is empty
     if analysis.training_log.empty:
@@ -630,7 +667,16 @@ def main():
         for trend, value in training_score['performance_trends'].items():
             print(f"{trend.replace('_', ' ').title()}: {value}")
 
+    # Make sure your DataFrame has columns: 'recovery_score', 'readiness_score', etc.
+    analysis.visualize_score_impact_over_time(
+    extra_scores={
+        'Recovery Score': 'recovery_score',
+        'Readiness Score': 'readiness_score'
+        # Add more if you compute more
+    }
     
+)
+
 
     
     

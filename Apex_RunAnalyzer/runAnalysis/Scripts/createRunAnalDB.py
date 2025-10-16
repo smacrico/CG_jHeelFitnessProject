@@ -8,7 +8,7 @@ import sys
 
 
 def create_table_if_not_exists():
-    conn = sqlite3.connect(r'g:/My Drive/Phoenix/DataBasesDev/Apex.db')
+    conn = sqlite3.connect(r'c:/smakrykoDBs/Apex.db')
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -20,7 +20,8 @@ def create_table_if_not_exists():
             vo2max INT,  
             cardiacdrift INT,
             heart_rate INT,
-            time INT 
+            time INT,
+            calories INT
         )
     ''')
     
@@ -31,21 +32,14 @@ create_table_if_not_exists()
     
 try:
     # Establish connections to both databases
-    # conn_artemis = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis.db')
-    conn_artemis = sqlite3.connect('C:/smakryko/myHealthData/DataBasesDev/artemisDEV.db')
-    
-    conn_running_analysis = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/Apex.db')
+    conn_artemis = sqlite3.connect('c:/smakrykoDBs/artemis.db')
+    conn_running_analysis = sqlite3.connect('c:/smakrykoDBs/Apex.db')
 
     # Create cursors
     cursor_artemis = conn_artemis.cursor()
     cursor_running_analysis = conn_running_analysis.cursor()
     
-    
-    
-
     # Select the specific columns from Artemis database
-    # FROM Artemistbl_Prod prod
-    # FROM Artemistbl_mariner
     cursor_artemis.execute('''
         SELECT running_economy, timestamp, distance, sport, vo2maxsession,  cardiacdrift, avg_heart_rate, total_elapsed_time
         FROM Artemistbl_fields
@@ -59,7 +53,7 @@ try:
     # Insert the data into running_session table in RunningAnalysis database
     cursor_running_analysis.executemany('''
         INSERT INTO running_sessions (running_economy, date, distance, sport, vo2max,  cardiacdrift, heart_rate, time)
-        VALUES (?, ?,?,?,?,?,?,?)
+        VALUES (?,?,?,?,?,?,?,?)
     ''', rows)
 
     # Commit the changes

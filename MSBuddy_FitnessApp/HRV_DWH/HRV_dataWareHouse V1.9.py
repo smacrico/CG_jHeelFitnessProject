@@ -13,7 +13,7 @@ plt.ion()  # Enable interactive mode for live updates
 # --- Configuration ---
 
 # --- DB Name and Log Path --- "Mercury_DWH-HRV.db"
-DB_PATH = "c:/smakryko/myHealthData/DataBasesDev/Mercury_DWH-HRV.db"
+DB_PATH = "c:/smakrykoDBs/Mercury_DWH-HRV.db"
 LOG_PATH = "c:/temp/logsDWH/hrv_unified.log"
 
 # Setup logging
