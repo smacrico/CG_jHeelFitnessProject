@@ -31,7 +31,9 @@ create_table_if_not_exists()
     
 try:
     # Establish connections to both databases
-    conn_artemis = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis.db')
+    # conn_artemis = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/artemis.db')
+    conn_artemis = sqlite3.connect('C:/smakryko/myHealthData/DataBasesDev/artemisDEV.db')
+    
     conn_running_analysis = sqlite3.connect('g:/My Drive/Phoenix/DataBasesDev/Apex.db')
 
     # Create cursors
