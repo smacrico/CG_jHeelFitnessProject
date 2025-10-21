@@ -349,8 +349,9 @@ if __name__ == "__main__":
     create_table_if_not_exists()
     # create_view()
     create_view_if_not_exists()
-    # all_session_data = parse_all_fit_files_in_folder('c:/users/stma/healthdata/fitfiles/activitiesTEST')
-    all_session_data = parse_all_fit_files_in_folder('c:/users/jheel/jheelhealthdata/fitfiles/activities')
+  
+    all_session_data = parse_all_fit_files_in_folder('C:/smakryko/myHealthData/FitFiles/Activities')
+    # all_session_data = parse_all_fit_files_in_folder('c:/users/jheel/jheelhealthdata/fitfiles/activities')
     insert_data_into_db(all_session_data)
     logging.info('All data inserted successfully.')
     print('All data inserted successfully.')
